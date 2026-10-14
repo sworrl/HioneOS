@@ -39,7 +39,7 @@ Every non-AOSP component on the device has been extracted, decompiled, and index
 
 | Native Module | Path | Description |
 |---|---|---|
-| `audio.primary.bengal.so` | `/vendor/lib64/hw/audio.primary.bengal.so` | Qualcomm Bengal Primary Audio HAL, patched by HiBy to support Direct ALSA output bypassing Android AudioFlinger, bit-perfect high sample rates up to 768kHz, and hardware DAC mute controls. |
+| `audio.primary.bengal.so` | `/vendor/lib64/hw/audio.primary.bengal.so` | Qualcomm Bengal Primary Audio HAL (AudioReach: PAL and AGM underneath). DIRECT outputs skip Android's mixer, but PAL runs the wired outputs at 192 kHz for every track, so nothing reaches the DACs at 768kHz or at the file's own rate (corrected 2026-10-10, see docs/research/hiby-audio-knobs.md section 10). Also hardware DAC mute controls. |
 | `sound_trigger.primary.bengal.so` | `/vendor/lib64/hw/sound_trigger.primary.bengal.so` | Hardware sound trigger and low-power audio DSP listener. |
 | `audioflacapp` | `/vendor/bin/audioflacapp` | Native command-line lossless audio test pipeline. |
 | `init.hiby.set.dwc3.rt.sh` | `/vendor/bin/init.hiby.set.dwc3.rt.sh` | Shell hook executed during USB enumeration to configure the Synopsys DWC3 USB controller for asynchronous USB DAC mode. |

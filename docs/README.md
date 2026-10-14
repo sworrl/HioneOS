@@ -10,7 +10,7 @@ Comprehensive hardware audits, telemetry reports, audio subsystem architecture, 
 2. [02. Out-of-Box Telemetry & Network Audit](02_out_of_box_telemetry_audit.md)
    - Analysis of pre-installed apps, background telemetry sockets, and network egress behavior.
 3. [03. HiBy M500 Audio Architecture Guide](03_audio_architecture_guide.md)
-   - Dual CS43198 MasterHIFI DAC topology, bit-perfect direct path, digital filters, analog gain, and 4.4mm balanced output specifications.
+   - Dual CS43198 MasterHIFI DAC topology, the direct output path (direct through Android, 192 kHz at the DAC), digital filters, analog gain, and 4.4mm balanced output specifications.
 4. [04. 24h Battery & Thermal Metrics Report](04_24h_battery_and_thermal_metrics.md)
    - Discharge rate benchmarks across idle, Wi-Fi transfer, screen-on playback, and DSD direct decode.
 5. [05. Fn Hardware Switch System Mod Specification](05_fn_switch_system_mod_spec.md)

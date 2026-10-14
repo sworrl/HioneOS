@@ -1,10 +1,172 @@
-# Miku Music — Changelog
+# MikuOS and Miku Music changelog
 
-Native Kotlin/Compose player for the HiBy M500 MIKU (`com.miku.player`).
+MikuOS for the HiBy M500 x Hatsune Miku, and Miku Music, its native Kotlin/Compose player
+(`com.miku.player`). Newest first. The README's What is verified table is the line between what
+has been checked on the device and what has not.
+
+## Pending flash: MikuOS 0.4.0
+
+MikuOS 0.4.0, Miku Music 2.3.0, Miku Update 0.4.0.
+
+The tree as of 2026-10-10, not flashed yet. Nothing here has been checked on the device, so all
+of it is Not yet in the README until the flash. Items marked in progress are still being written.
+
+### Mascot packs
+
+- **Miku or Hione, switched live** in Settings, Theme & mascot, or with
+  `settings put global miku_mascot_pack hione`. Every MikuOS app swaps colors, names, character
+  art and home-screen app names at draw time. Miku Music shows as Hione Hits. The boot video, the
+  SystemUI popups and the system app names still need the build-time swap
+  (`MIKUOS_MASCOT=hione`).
+- The Hione pack ships inside Miku Update, which serves pack files to the other apps. Later packs
+  can come through Miku Update as content packs.
+- **Seasonal and holiday wallpapers**, from the active pack's art. Holidays can be International,
+  Local, Custom or Off, with a reminder on the day (the day before for memorial days). Seasons
+  flip in the southern hemisphere. A wallpaper you picked yourself stays. The art so far is
+  Hione's: two fall scenes and nine holidays.
+- BPM game art for Hione (in progress).
+
+### Audio and the DAC
+
+- **The docs stop calling the audio path bit-perfect.** Android hands Miku Music's track to the HAL
+  at the file's own rate with no mixer, and that is still true. Below it, PAL pins the wired
+  outputs to 192kHz (`resourcemanager_bengal_idp.xml`) and the ADSP converts every track to 192kHz
+  before the DACs. Found on 0.3.1 on 2026-10-10, and it is why all five filters measured the same.
+- The Hardware app's DAC page draws each filter's response, says the DAC runs at 192kHz and the
+  filters sound the same, and can lay a profile's EQ or a mic sweep of the speaker over it.
+- The PAL half of native-rate output is drafted behind `MIKUOS_NATIVE_RATE`, off. It must stay off
+  until the DAC's rate register follows the backend rate, which needs a kernel module patch.
+- **Tempo** from the whole file with QM-DSP's TempoTrackV2, and live beats from BTrack on the
+  player's own PCM. Both vendored unmodified, listed in ATTRIBUTIONS.md.
+- The leek moved off the album art and the visualizer to sit next to Play along, and turns on the
+  beat. Packs without Miku in them get Hione's coda lock there instead.
+- Shell commands so a measurement tool can play a test file and set the DAC over adb. Hione uses
+  them.
+
+### FM
+
+- **Seek and scan on the Si4705** (in progress). The old seek ran on the Qualcomm core, which has
+  no antenna, so it stopped where it started. The new one steps the Si4705 channel by channel, with
+  thresholds from a full band sweep on 0.3.1.
+- The preset action is shared with MikuPod and Riot mode, and signal strength polls in the
+  background.
+
+### Weather (in progress)
+
+- Rain radar from RainViewer, pollen where Open-Meteo has it (Europe), and a map that is free by
+  default (OpenStreetMap data on CARTO tiles). Optional Windy keys add Windy's point forecast and
+  nearby webcams. The keys are stored encrypted.
+
+### System
+
+- **Tap to wake.** Double-tap wake is on by default, with a switch in MikuSettings. HiBy ships it
+  off.
+- **No more screen wake on every charger plug and unplug.** MikuOS's overlay for this lost to
+  Qualcomm's on 0.3.1 (priority 1 against 100). It now sits at 400.
+- **System updates over the air, groundwork.** The image carries MikuOS's own payload keys in
+  `otacerts.zip` (`MIKUOS_AB_OTA=1`), and Miku Update can hand a signed payload to
+  `update_engine`. The 0.4.0 image goes on by wire. Installing, booting the new slot and falling
+  back are untested.
+- **Android Auto** gets its fourteen runtime permissions at first boot, and MikuSettings has a
+  setup card that opens its settings.
+- System event sounds go through the system bridge, with a Sounds page in Settings.
+- Locking from the power menu goes straight to the Miku lockscreen, and the PIN pad can scramble
+  its digits.
+
+## 2026-10-10: MikuOS 0.3.1
+
+A rebuild of 0.3.0 on the author's M500, not published on its own. The 3.5mm measurements and the
+192kHz finding above were made on it.
+
+## 2026-10-10: DAC settings that actually apply, HiBy's 1.30 fixes, retro modes, FM in the car
+
+MikuOS 0.3.0, Miku Music 2.2.0, Miku FM 1.2.0.
+
+- **DAC settings reach the driver.** Before 0.2.0 nothing MikuOS set ever got to the DAC, because
+  HiBy's boot service skips any device not named M500. The system bridge sets the values and a
+  vendor init file writes the driver nodes. Confirmed from the driver's kernel log on both DACs.
+  One DAC page (the Hardware app), and a status bar badge showing what was applied.
+- **From HiBy 1.30:** their cs43198 driver (NOS fixed, both DACs written), the fuel gauge driver,
+  the health HAL charger fix, and notification sounds back (1.20 stubbed `playSound()` out).
+  Symbol CRCs checked against the 1.20 kernel. With only 1.20, the build patches the NOS mask.
+- **FM:** the reach model stopped counting the same ridge twice, measured signal beats prediction,
+  hardware buttons, Android Auto source, a new icon, RDS and song ID in the media session.
+- **Riot mode and MikuPod** as BPM game unlocks, with haptics and the radio. No modern system UI
+  while either is in front.
+- Haptics across the OS. HiBy shipped touch vibration off.
+- The Miku shade gets notifications and opens from any app.
+- Screen lock with a Miku PIN pad, and a trust agent so it asks only after a restart.
+- Boot setup moved into the system bridge. The old rc lines never ran under enforcing SELinux.
+- CPU power profiles and a charge limit that actually write their nodes.
+- adb needs an authorized key even on dev builds. `MIKUOS_RELEASE=1` strips the developer access.
+- Android Auto bundled as a privileged system app.
+- Album art: a cover shared by many different albums is ignored and looked up by artist and album.
+- New apps: Clock, Calculator, Calendar, Camera, Gallery, Recorder, Miku Update, Voice Check.
+- New boot video and popup art, voice clips that pass a speech check, a text pass across the apps.
+
+## 2026-10-10: MikuOS 0.2.0
+
+MikuOS 0.2.0, Miku Music 2.1.0, Miku FM 1.1.0.
+
+Built the same day as 0.3.0 and published with it, not on its own. This is where the
+DAC settings first went through the system bridge and `miku_audio.rc` instead of paths that never
+reached the driver.
+
+## 2026-10-10: MikuOS 0.1.17 and 0.1.18
+
+Miku FM 1.0.13 and 1.0.14. Interim images on the author's M500.
+
+- **FM RDS confirmed.** On 0.1.17 a strong station (WVAQ 101.9) showed its program type and
+  RadioText, with the patched Si4705 driver from 0.1.16.
+
+## 2026-10-09: RDS the driver was hiding, and playing to every output at once
+
+MikuOS 0.1.16, Miku Music 2.0.311 to 2.0.314.
+
+- **The Si4705 driver patch.** HiBy's driver copied only two of the four blocks of each RDS group
+  to apps, so no app could show a station name or RadioText. It only armed RDS from `poll()`,
+  which stock never calls, and it read the stereo pilot and threw it away.
+  `os/patch_si4705_rds.py` fixes the copy length and exposes the pilot and blend, hash-checked
+  against the stock module.
+- **Playing to every output at once.** The old "dual audio matrix" sent vendor parameters that do
+  not exist. Miku Music now plays the direct track to the best output and a synced copy to each of
+  the others. Per-output volume sliders and timestamp-based sync came in 2.0.313.
+- USB DAC routing through the new system bridge (`com.miku.sysbridge`), radio now-playing on the
+  HUD and widgets.
+
+## 2026-10-09: FM that plays
+
+MikuOS 0.1.15, Miku FM 1.0.11.
+
+- **The tuner is audible.** The Si4705 starts in a 24-bit mono output format and PAL reads that
+  backend as 48kHz 16-bit stereo, so the chip fed misaligned samples into the loopback. That is
+  white noise, not quiet audio. Setting the channel mode at power-on, the way stock does, fixed it.
+- One writer for the tuner gain, so the HAL no longer gets 1.0 from the media stream at start.
+- "TUNER ERROR" after a flash was an adb-installed copy of `com.caf.fmradio` in `/data` shadowing
+  the bundled one. `adb uninstall com.caf.fmradio` goes back to the bundled app.
+
+## 2026-10-09: MikuOS 0.1.14
+
+- First boot grants the hardware app fine, coarse and background location. Without background, a
+  background process gets an empty Wi-Fi scan list rather than an error, and the fused position
+  published nothing for a whole image.
+- The hardware app builds with the other modules instead of being injected from whatever APK was
+  on disk.
+- The FM tuner gain is anchored to the one value measured audible.
+
+## 2026-10-09: MikuOS 0.1.3 to 0.1.13
+
+Test images flashed during the FM work that day, one after another. They are not described one by
+one here. The commit log has them.
 
 ## 2026-10-09 — the FM tuner makes sound, and gets a control surface
 
 MikuOS 0.1.2, Miku FM 1.0.2.
+
+Two corrections from later that day, left here rather than rewriting the entry. The tuner that
+receives is the Si4705, not the Qualcomm WCN core (the "Also" list below has it backwards). And
+the station did not come through cleanly until the chip's output format was fixed in 0.1.15,
+which is the version the README counts as the first one where FM is audible.
 
 ### The tuner is audible for the first time
 
@@ -81,9 +243,10 @@ reflects whether a cable is actually plugged in, because on this board the cable
 
 ## A gap you should know about
 
-Every entry below is from 2026-08-15 and stops at 0.9.17. The player is on
-2.0.309. The file was written in one sitting and then never kept up, while
-roughly a hundred releases happened without it.
+Every entry below is from 2026-08-15 and stops at 0.9.17. The player was on
+2.0.309 when this note was written (2026-10-09). The file was written in one
+sitting and then never kept up, while roughly a hundred releases happened
+without it.
 
 Those hundred are not reconstructed here. Writing them now would mean inventing
 dates and attributing changes from memory, and a changelog that cannot be
@@ -93,13 +256,14 @@ history and it is written to be read:
     git log --oneline
     git log --stat <path>
 
-What landed in the gap, in outline, so the shape is not a mystery: bit-perfect
-DIRECT output to the dual CS43198 DACs; a Last.fm scrobbler with an offline
+What landed in the gap, in outline, so the shape is not a mystery: DIRECT
+output at the file's own rate with no Android mixer (the driver below still runs
+the DACs at 192kHz, see the 0.4.0 entry); a Last.fm scrobbler with an offline
 queue; listening statistics and the Miku Rewind recap; the Miku Shaders GLES2
 visualizer engine alongside native libprojectM with 9,825 presets; a BLE remote
 peripheral; CUE-sheet splitting; artist photography from Wikidata; an alarm
 clock; an artwork and booklet viewer; a taste model with a radio station mode;
-a TV cast companion that mirrors the decoded PCM bit-perfect; and four
+a TV cast companion that sends the decoded PCM byte for byte; and four
 successive sweeps that removed telemetry the UI was presenting as measured when
 nothing had measured it.
 

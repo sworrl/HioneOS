@@ -78,8 +78,8 @@
   * **USB-C Audio / OTG Digital Transport**
 * **Audio HAL & Native Plugins**:
   * AudioSphere 3D spatializer (`libasphere.so`)
-  * HiBy Custom Bit-Perfect Audio Direct Path (`ro.vendor.hibytest_support=true`)
-  * Hardware sample rates: 44.1 kHz, 48.0 kHz, 88.2 kHz, 96.0 kHz, 176.4 kHz, 192.0 kHz, 352.8 kHz, 384.0 kHz, DSD64/128/256 native.
+  * HiBy's direct audio path flag (`ro.vendor.hibytest_support=true`). Correction 2026-10-10: the path is direct through Android only. PAL then runs the wired outputs at 192 kHz for every track, so it is not bit-perfect at the DAC (docs/research/hiby-audio-knobs.md section 10)
+  * Sample rates the audio policy accepts: 44.1 kHz, 48.0 kHz, 88.2 kHz, 96.0 kHz, 176.4 kHz, 192.0 kHz, 352.8 kHz, 384.0 kHz, DSD64/128/256. The DACs themselves always run at 192 kHz (correction 2026-10-10).
 
 ---
 

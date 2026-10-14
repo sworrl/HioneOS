@@ -14,7 +14,7 @@
 - **Base Version**: Linux `4.19.320+` LTS (Qualcomm SM6225 BSP branch).
 - **Rationale**:
   - Ensures 100% binary compatibility with proprietary Qualcomm SM6225 firmware blobs:
-    - Hexagon ADSP bit-perfect audio firmware (`q6dsp`, `snd-soc-sm6225`).
+    - Hexagon ADSP audio firmware (`q6dsp`, `snd-soc-sm6225`). It converts every wired stream to 192 kHz today, see docs/research/hiby-audio-knobs.md section 10.
     - Adreno 610 GPU `kgsl` kernel driver and display DRM compositor.
     - SGM31324 Pulsar Dual-Die RGB LED PWM driver.
     - HiBy `sa_sound_setting` CS43198 ALSA kernel driver.
@@ -88,7 +88,7 @@
   - Full app drawer with search and spring drag physics.
 
 ### D. `Miku Music Player` (`com.miku.player`)
-- Bit-perfect direct ALSA CS43198 streaming.
+- DIRECT output with no Android mixer (done). The file's own rate at the CS43198s (not done: the driver runs them at 192 kHz).
 - Release year resolution on all songs, albums, and discographies in glowing Miku Gold (`#FFD54F`).
 - Hexagon tech badges (`24-BIT`, `96KHZ`, `FLAC`, `DSD`) across all grids, lists, and playback cards.
 

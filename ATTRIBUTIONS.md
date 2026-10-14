@@ -119,6 +119,9 @@ authority; the summary below is for orientation.
 |---|---|---|---|
 | libprojectM | `miku-player-kotlin/app/src/main/cpp/vendor/projectm` | LGPL-2.1 | Tracked at upstream master (4.2.0). Built as a library and linked; not modified |
 | fastboot.js (`android-fastboot` 1.1.3) | `tools/web-installer/js/vendor/` | MIT, Copyright (c) 2021 Danny Lin | Byte-identical to the npm `dist/fastboot.min.mjs`, not modified. Its own `LICENSE.fastboot.js.txt` and `NOTICE.txt` ship alongside it |
+| QM-DSP (subset: DetectionFunction, PhaseVocoder, FFT, MathUtilities, TempoTrackV2) | `miku-player-kotlin/app/src/main/cpp/mikubeat/qm-dsp` | GPL-2.0-or-later, Copyright Centre for Digital Music, Queen Mary University of London, and the named authors (TempoTrackV2: Matthew Davies) | From github.com/c4dm/qm-dsp at e34a3cc. Whole-track tempo in Miku Music, the same tracker Mixxx uses. Files are unmodified and keep their headers. `COPYING` ships alongside |
+| KISS FFT 1.3.0 | `miku-player-kotlin/app/src/main/cpp/mikubeat/qm-dsp/ext/kissfft` | BSD-3-Clause, Copyright (c) 2003-2010 Mark Borgerding | The copy bundled with QM-DSP, unmodified. Built in double precision and shared by QM-DSP and BTrack. `COPYING` ships alongside |
+| BTrack | `miku-player-kotlin/app/src/main/cpp/mikubeat/btrack` | GPL-3.0-or-later, Copyright (C) 2008-2014 Queen Mary University of London, Adam Stark | From github.com/adamstark/BTrack at 9d61276. Live beat tracking on the player's PCM. Files are unmodified. Its one libsamplerate call is served by our own `shim/samplerate_shim.c` instead of libsamplerate. `LICENSE.txt` ships alongside |
 
 ### 5.3 Forked code
 
@@ -133,6 +136,26 @@ The preset pack shipped in the player's assets is drawn from the MilkDrop and pr
 community. Individual presets carry their own authorship and terms, which vary and in many cases are
 not stated. Presets written for this project are named `Miku - *.milk`. If you authored a preset in
 the pack and want it credited differently or removed, open an issue.
+
+### 5.5 Weather data, maps and ported code
+
+The launcher's weather screen (`mikuos-launcher/.../weather/`) pulls from these services at run time.
+Nothing from them is bundled. Credits are shown on screen next to the data, as each provider asks.
+
+| Source | What it supplies | License or terms | Credit shown |
+|---|---|---|---|
+| [Open-Meteo](https://open-meteo.com) | Forecast, 15-minute precipitation, air quality and pollen (CAMS) | Data under CC BY 4.0. Free API for non-commercial use | "Open-Meteo" on the forecast surfaces |
+| [RainViewer](https://www.rainviewer.com) | Radar frames for the nowcast and the map | RainViewer API terms: free for personal and non-commercial use with credit | "Radar: RainViewer" on the radar and map |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright) | Map data under the basemap tiles | ODbL 1.0, © OpenStreetMap contributors | "© OpenStreetMap contributors" on every map |
+| [Esri](https://www.esri.com) Dark Gray Canvas | The basemap tiles themselves (base and labels) | Esri terms of use, with the credit Esri asks for | "Esri, HERE, Garmin" on every map |
+| [Windy](https://www.windy.com) | Point Forecast, Webcams and the embed map layers. Only with the user's own API key | Windy API terms (api.windy.com). Keys belong to the user and are never shipped | "Windy.com" on Windy layers, "Webcams provided by windy.com" on webcams |
+| National Weather Service (api.weather.gov) | Observations and alerts (US) | US government work, public domain | "NWS" in the sources line |
+
+The weather logic (rain nowcast and storm motion from radar frames, the dBZ palette decode, arrival
+estimate, frost outlook, pollen, location accuracy guard, Windy webcams and point forecast) was
+ported to Kotlin from sworrl's own KDE Plasma widget, Windy Weather 3.2.0
+(`~/Documents/GitHub/kde_widg/windy-weather`). That repo has no LICENSE file; its `metadata.json`
+declares GPL-2.0-or-later, which is compatible with this project's GPL-3.0-or-later. Same author.
 
 ---
 
@@ -178,3 +201,10 @@ Open an issue or a pull request.
 
 If a license here is wrong, an attribution is missing, or something is in this project that should
 not be, open an issue or email github@falcontechnix.com.
+
+### Blackjack meme (art/blackjack/)
+
+`blackjack-meme.png`, `.jxl` and `.webp` are a fan meme made by sworrl from a Futurama frame of Bender,
+with the caption changed to be about our audio driver. Futurama and Bender belong to their owners.
+It's used here as parody, isn't sold, and isn't an endorsement. It's shown in the README, the press
+kit, and the MikuOS Settings About page.

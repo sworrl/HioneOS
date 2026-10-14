@@ -102,7 +102,7 @@ Content-Type: application/json; charset=UTF-8
 ## 5. Deconstruction of New Firmware Features (v1.70 / v1.40)
 
 ### A. "HiBy Render" Architecture
-* **Mechanism**: HiBy's next-generation direct audio rendering pipeline. It establishes an internal local rendering bridge allowing third-party bit-perfect applications and network audio streams (DLNA / AirPlay / HiByCast) to bypass Android AudioFlinger resampling directly to the native audio HAL (`audio.primary.bengal.so`).
+* **Mechanism**: HiBy's next-generation direct audio rendering pipeline. It establishes an internal local rendering bridge allowing third-party applications and network audio streams (DLNA / AirPlay / HiByCast) to bypass Android AudioFlinger resampling directly to the native audio HAL (`audio.primary.bengal.so`). Correction 2026-10-10: below the HAL, PAL still runs the wired outputs at 192 kHz, so this is direct through Android only, not bit-perfect at the DAC.
 * **Implementation for MikuOS**: We can integrate this rendering pathway into our custom pure Kotlin audio engine ([`miku-player-kotlin`](file:///home/reaver/Documents/GitHub/m500/miku-player-kotlin/)) using direct JNI bindings to `libasphere.so` and ALSA device endpoints.
 
 ### B. Bluetooth Controller 48kHz Lock: Root Cause & Fix
@@ -125,4 +125,4 @@ Content-Type: application/json; charset=UTF-8
    * `/sys/devices/platform/sa_sound_setting/dre_mode` (0/1)
    * `/sys/devices/platform/sa_sound_setting/high_power_mode` (0/1)
 3. **Application Decoupling**:
-   Continue building our independent 100% pure Kotlin suite ([`miku-player-kotlin`](file:///home/reaver/Documents/GitHub/m500/miku-player-kotlin/)), avoiding closed proprietary telemetry daemons while retaining 100% bit-perfect CS43198 MasterHIFI™ playback.
+   Continue building our independent 100% pure Kotlin suite ([`miku-player-kotlin`](file:///home/reaver/Documents/GitHub/m500/miku-player-kotlin/)), avoiding closed proprietary telemetry daemons while keeping Miku Music's DIRECT output (no Android mixer). Getting the file's own rate to the CS43198s is separate work, see docs/research/hiby-audio-knobs.md section 10.

@@ -389,8 +389,9 @@ comparison, so some differences may be 4G-specific.
 **Relevance to MikuOS:**
 
 - DTA as HiBy built it is an allow-list on top of `AudioTrack`, plus properties that the HAL
-  reads. MikuOS already plays bit-perfect through its own player, so there is nothing to adopt
-  unless system-wide direct output for third-party apps is wanted.
+  reads. MikuOS already gets DIRECT output for its own player, so there is nothing to adopt
+  unless system-wide direct output for third-party apps is wanted. Neither DTA nor MikuOS gets
+  past the 192 kHz PAL backend (hiby-audio-knobs.md section 10).
 - A charge limit is worth having. The HiBy property `persist.vendor.usb.charging.protect_percent`
   is enforced below the framework, so MikuOS could only reuse it if MikuOS runs a 1.40+ vendor or
   kernel. Otherwise it needs its own limit in the charger path (mp2731) or in a userspace service.

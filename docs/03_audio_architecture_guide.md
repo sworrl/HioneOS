@@ -2,7 +2,13 @@
 
 A working reference for the M500 MIKU's (mostly undocumented) audio settings, what
 each one actually does, and how to drive them — plus how our custom-music setup
-(formats, bit-perfect playback, the on-device library) fits in.
+(formats, direct playback, the on-device library) fits in.
+
+**Correction, 2026-10-10.** This guide said HiBy's direct path is bit-perfect and that a 96kHz
+file clocks the DAC at 96kHz. Neither is true at the DAC. DIRECT output skips Android's mixer,
+but below the HAL, PAL runs the wired outputs at 192kHz for every track
+(`resourcemanager_bengal_idp.xml`) and the ADSP converts to that. The lines below are corrected.
+The full trail is in docs/research/hiby-audio-knobs.md section 10.
 
 Compiled 2026-08-14 from **on-device probing** of this exact unit + manufacturer/
 reviewer research. Where the menu wording and the internal setting key differ, both
@@ -18,14 +24,14 @@ are given. Anything not 100% confirmed on-device is marked *(verify)*.
 | Amp | Four **SGM8261** op-amps |
 | Outputs | 3.5mm single-ended (~123 mW) + 4.4mm balanced (~449 mW) |
 | SoC | Qualcomm **Bengal/Khaje** class (Snapdragon 4-series), Android 14 |
-| Bit-perfect | HiBy **DTA (Direct Transport Audio)** — bypasses Android's resampler so the DAC gets untouched data |
+| Direct output | HiBy **DTA (Direct Transport Audio)**. Skips Android's mixer and resampler. The DAC still gets 192kHz from the ADSP, whatever the file is |
 
-**DTA is why bit-perfect works.** When HiByMusic plays a local file it opens a
+**DTA is why HiBy Music skips the mixer.** When HiByMusic plays a local file it opens a
 `DIRECT` audio output straight to the DAC (we can see it in the audio pipeline as an
 `AudioOut_xD, type 1 (DIRECT)` thread clocking the file's real sample rate). Apps
 that go through Android's mixer (Spotify, YouTube) are resampled to the mixer's fixed
-48kHz/32-bit float and are **not** bit-perfect. `direct_support_app_list` currently
-lists only `com.hiby.music`.
+48kHz/32-bit float. `direct_support_app_list` currently lists only `com.hiby.music`. Both
+paths end at the same 192kHz backend below the HAL.
 
 ---
 
@@ -160,7 +166,7 @@ settings put global vendor.audio.hiby.high_power hpower_disable   # (verify valu
 
 ---
 
-## 8. Custom music — formats & bit-perfect
+## 8. Custom music: formats and direct playback
 
 **What's actually in the library (from our on-device scan of the files themselves):**
 a mix of **FLAC 44.1kHz/16-bit** (CD), **FLAC 44.1kHz/24-bit** (hi-res, e.g. the
@@ -174,14 +180,14 @@ Guidelines for adding/curating tracks:
 - Sample **rate** is the honest "is this hi-res" tell (44.1/48 = standard, 96/192 =
   hi-res). Bit **depth** matters less audibly than people think; 24-bit mainly buys
   headroom/noise-floor, not "more detail."
-- Play through **HiByMusic** to get **DTA bit-perfect** to the DAC. Other apps get
-  resampled to 48kHz.
+- Play through **HiByMusic** (or Miku Music on MikuOS) to skip Android's mixer. Other apps get
+  resampled to 48kHz by it. Either way the DAC runs at 192kHz.
 - In HiByMusic, **MSEB** (tone-tilt "sound tuning") and **PEQ / graphic EQ** are the
   per-taste tone controls — leave them flat for reference, or use MSEB's "Temperature/
   Note thickness" sliders for gentle warmth.
 - NIN note: the current Add Violence tracks scan at **48kHz** — the 96kHz/24-bit
-  Definitive Edition masters would clock the DAC at 96kHz, so there's a genuine hi-res
-  upgrade available for those.
+  Definitive Edition masters would be a genuine hi-res upgrade for those, though today the
+  DAC runs at 192kHz whatever the source.
 
 **The on-device library (built by our widget mod):**
 - SQLite at `…/com.hiby.widget/files/library.db` (internal) — the widget reads it to
