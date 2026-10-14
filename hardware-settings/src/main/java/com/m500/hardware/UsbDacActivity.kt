@@ -226,7 +226,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF030D11))
+            .background(Mascot.color(0xFF030D11))
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
@@ -249,7 +249,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                             Modifier
                                 .size(10.dp)
                                 .clip(CircleShape)
-                                .background(if (streaming) HwMikuTeal else if (hostAttached) HwMikuPink else HwMuted)
+                                .background(if (streaming) HwHioneTeal else if (hostAttached) HwHionePink else HwMuted)
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
@@ -287,16 +287,16 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         .clip(RoundedCornerShape(18.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(Color(0xFF07242B), Color(0xFF05171C))
+                                listOf(Mascot.color(0xFF07242B), Mascot.color(0xFF05171C))
                             )
                         )
-                        .border(1.dp, HwMikuTeal.copy(alpha = pulseAlpha), RoundedCornerShape(18.dp))
+                        .border(1.dp, HwHioneTeal.copy(alpha = pulseAlpha), RoundedCornerShape(18.dp))
                         .padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         if (streaming) "UAC2 USB AUDIO STREAM · LIVE" else "UAC2 USB AUDIO STREAM · $streamStatus",
-                        color = if (streaming) HwMikuTeal else HwMuted,
+                        color = if (streaming) HwHioneTeal else HwMuted,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.2.sp
@@ -315,10 +315,10 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                             .clip(CircleShape)
                             .background(
                                 Brush.radialGradient(
-                                    listOf(HwMikuTeal.copy(alpha = 0.20f * pulseAlpha), Color(0xFF031114))
+                                    listOf(HwHioneTeal.copy(alpha = 0.20f * pulseAlpha), Mascot.color(0xFF031114))
                                 )
                             )
-                            .border(2.dp, HwMikuTeal.copy(alpha = pulseAlpha), CircleShape),
+                            .border(2.dp, HwHioneTeal.copy(alpha = pulseAlpha), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -331,13 +331,13 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                             Spacer(Modifier.height(2.dp))
                             Text(
                                 if (showBits >= 32) "32-bit" else "$showBits-bit PCM",
-                                color = if (live) HwMikuTeal else HwMuted,
+                                color = if (live) HwHioneTeal else HwMuted,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 if (live) "LIVE" else "CONFIGURED · NO STREAM",
-                                color = if (live) HwMikuTeal else HwMuted,
+                                color = if (live) HwHioneTeal else HwMuted,
                                 fontSize = 8.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
@@ -346,13 +346,13 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                             Box(
                                 Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(HwMikuPink.copy(alpha = 0.25f))
-                                    .border(1.dp, HwMikuPink, RoundedCornerShape(6.dp))
+                                    .background(HwHionePink.copy(alpha = 0.25f))
+                                    .border(1.dp, HwHionePink, RoundedCornerShape(6.dp))
                                     .padding(horizontal = 8.dp, vertical = 2.dp)
                             ) {
                                 Text(
                                     filter?.label?.substringBefore(",")?.uppercase() ?: "FILTER UNKNOWN",
-                                    color = HwMikuPink,
+                                    color = HwHionePink,
                                     fontSize = 9.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -371,7 +371,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                             Text("STREAM ACTIVITY (no level meter source)", color = HwMuted, fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
                             Text(
                                 nominalBytesPerSec?.let { "${String.format("%.1f", it / 1024f)} KB/s nominal" } ?: "$NA KB/s",
-                                color = if (nominalBytesPerSec != null) HwMikuTeal else HwMuted,
+                                color = if (nominalBytesPerSec != null) HwHioneTeal else HwMuted,
                                 fontSize = 10.5.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
                             )
                         }
@@ -379,8 +379,8 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
 
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                             Text("L", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(16.dp))
-                            Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF030D10))) {
-                                Box(Modifier.fillMaxWidth(activityFill).fillMaxHeight().background(Brush.horizontalGradient(listOf(HwMikuTeal, HwMikuPink))))
+                            Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(Mascot.color(0xFF030D10))) {
+                                Box(Modifier.fillMaxWidth(activityFill).fillMaxHeight().background(Brush.horizontalGradient(listOf(HwHioneTeal, HwHionePink))))
                             }
                         }
 
@@ -388,8 +388,8 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
 
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                             Text("R", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(16.dp))
-                            Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF030D10))) {
-                                Box(Modifier.fillMaxWidth(activityFill).fillMaxHeight().background(Brush.horizontalGradient(listOf(HwMikuTeal, HwMikuPink))))
+                            Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(Mascot.color(0xFF030D10))) {
+                                Box(Modifier.fillMaxWidth(activityFill).fillMaxHeight().background(Brush.horizontalGradient(listOf(HwHioneTeal, HwHionePink))))
                             }
                         }
                     }
@@ -400,7 +400,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
             item {
                 Text(
                     "HOST AND USB CONTROLLER",
-                    color = HwMikuTeal,
+                    color = HwHioneTeal,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -412,7 +412,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
                         .background(HwSurface1)
-                        .border(1.dp, HwMikuTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                        .border(1.dp, HwHioneTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
                         .padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -424,7 +424,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         udcState == "not attached" -> "NO HOST ATTACHED"
                         else -> udcState.uppercase()
                     }
-                    VerboseDiagnosticRow("Host Connection State", stateLabel, if (udcState == "configured") HwMikuTeal else HwMuted)
+                    VerboseDiagnosticRow("Host Connection State", stateLabel, if (udcState == "configured") HwHioneTeal else HwMuted)
                     VerboseDiagnosticRow("Host Bus Speed", when (s?.udcSpeed?.lowercase()) {
                         null -> NA
                         "high-speed" -> "High-Speed (480 Mbps)"
@@ -437,7 +437,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                     VerboseDiagnosticRow("USB Gadget Functions", s?.gadgetFunctions ?: NA, Color.White)
                     VerboseDiagnosticRow("Host Interface Protocol", if (s?.uac2Composed == true) "UAC2 (USB Audio Class 2.0)" else "$NA (uac2 not composed)", Color.White)
                     VerboseDiagnosticRow("USB Device Controller", s?.udcName ?: NA, Color.White)
-                    VerboseDiagnosticRow("ALSA Gadget Card", s?.cardId?.let { "card${s?.cardIndex} [$it]" } ?: NA, HwMikuTeal)
+                    VerboseDiagnosticRow("ALSA Gadget Card", s?.cardId?.let { "card${s?.cardIndex} [$it]" } ?: NA, HwHioneTeal)
                     VerboseDiagnosticRow("PCM Period / Buffer", if (s?.periodSize != null && s.bufferSize != null) "${s.periodSize} / ${s.bufferSize} frames" else NA, Color.White)
                     VerboseDiagnosticRow("Underrun Counter", "not exposed by kernel", HwMuted)
                 }
@@ -447,7 +447,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
             item {
                 Text(
                     "LIVE PCM STREAM",
-                    color = HwMikuTeal,
+                    color = HwHioneTeal,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -459,25 +459,25 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
                         .background(HwSurface1)
-                        .border(1.dp, HwMikuTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                        .border(1.dp, HwHioneTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
                         .padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    VerboseDiagnosticRow("Sampling Frequency", liveRate?.let { "$it Hz (${formatKhz(it)})" } ?: "$NA (configured $cfgRate Hz)", if (liveRate != null) HwMikuTeal else HwMuted)
+                    VerboseDiagnosticRow("Sampling Frequency", liveRate?.let { "$it Hz (${formatKhz(it)})" } ?: "$NA (configured $cfgRate Hz)", if (liveRate != null) HwHioneTeal else HwMuted)
                     VerboseDiagnosticRow("Sample Format", s?.format?.let { f -> liveBits?.let { "$f ($it-bit)" } ?: f } ?: "$NA (configured $cfgBits-bit)", if (s?.format != null) Color.White else HwMuted)
                     VerboseDiagnosticRow("Stream Channel Map", s?.channels?.let { if (it == 2) "2.0 Stereo" else "$it ch" } ?: NA, Color.White)
-                    VerboseDiagnosticRow("Nominal Bitrate", nominalBytesPerSec?.let { "${it * 8 / 1000} kbps (${String.format("%.2f", it * 8 / 1_000_000f)} Mbps)" } ?: NA, if (nominalBytesPerSec != null) HwMikuPink else HwMuted)
+                    VerboseDiagnosticRow("Nominal Bitrate", nominalBytesPerSec?.let { "${it * 8 / 1000} kbps (${String.format("%.2f", it * 8 / 1_000_000f)} Mbps)" } ?: NA, if (nominalBytesPerSec != null) HwHionePink else HwMuted)
                     val ingress = s?.hwPtrFrames?.let { fr -> s?.frameBytes?.let { fb -> fr * fb } }
                     VerboseDiagnosticRow("Ingress Transferred (hw_ptr)", ingress?.let { "${String.format("%.2f", it / (1024f * 1024f))} MB" } ?: NA, Color.White)
                     VerboseDiagnosticRow("Kernel PCM Node", s?.pcmNode?.removePrefix("/proc/asound/")?.let { "$it (${s?.streamState ?: NA})" } ?: NA, HwMuted)
                 }
             }
 
-            // Section 3: Hardware Output Stage (persist.vendor.audio.miku.* / Settings.Global; "unknown" when neither answers)
+            // Section 3: Hardware Output Stage (persist.vendor.audio.hione.* / Settings.Global; "unknown" when neither answers)
             item {
                 Text(
                     "CIRRUS LOGIC DUAL CS43198 DAC",
-                    color = HwMikuTeal,
+                    color = HwHioneTeal,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -489,21 +489,21 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
                         .background(HwSurface1)
-                        .border(1.dp, HwMikuTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                        .border(1.dp, HwHioneTeal.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
                         .padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    VerboseDiagnosticRow("DAC Architecture", "Dual CS43198 MasterHIFI, parallel", HwMikuTeal)
+                    VerboseDiagnosticRow("DAC Architecture", "Dual CS43198 MasterHIFI, parallel", HwHioneTeal)
                     VerboseDiagnosticRow("Reconstruction Filter", filter?.label ?: "unknown", if (filter != null) Color.White else HwMuted)
                     VerboseDiagnosticRow("Gain (digital offset)", gain?.label ?: "unknown", if (gain != null) Color.White else HwMuted)
                     VerboseDiagnosticRow("Physical Output Port", when (outputMode) {
                         CirrusLogicManager.OutputMode.LINE_OUT -> "Line Out (LO)"
                         CirrusLogicManager.OutputMode.HEADPHONE_OUT -> "Headphone Out (PO)"
                         null -> "unknown"
-                    }, if (outputMode != null) HwMikuPink else HwMuted)
-                    VerboseDiagnosticRow("Dynamic Range Enhancement (DRE)", when (isDreActive) { true -> "Enabled"; false -> "Disabled"; null -> "unknown" }, if (isDreActive == true) HwMikuTeal else HwMuted)
-                    VerboseDiagnosticRow("High power", when (highPower) { true -> "On"; false -> "Off"; null -> "unknown" }, if (highPower == true) HwMikuTeal else HwMuted)
-                    VerboseDiagnosticRow("DAC control path", when (bridgeOk) { true -> "MikuOS system bridge"; false -> "bridge not installed, settings cannot apply"; null -> NA }, if (bridgeOk == true) Color.White else HwMuted)
+                    }, if (outputMode != null) HwHionePink else HwMuted)
+                    VerboseDiagnosticRow("Dynamic Range Enhancement (DRE)", when (isDreActive) { true -> "Enabled"; false -> "Disabled"; null -> "unknown" }, if (isDreActive == true) HwHioneTeal else HwMuted)
+                    VerboseDiagnosticRow("High power", when (highPower) { true -> "On"; false -> "Off"; null -> "unknown" }, if (highPower == true) HwHioneTeal else HwMuted)
+                    VerboseDiagnosticRow("DAC control path", when (bridgeOk) { true -> "${Mascot.osName} system bridge"; false -> "bridge not installed, settings cannot apply"; null -> NA }, if (bridgeOk == true) Color.White else HwMuted)
                 }
             }
 
@@ -515,7 +515,7 @@ fun VerboseUsbDacScreen(onExit: () -> Unit) {
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(25.dp))
-                        .background(Brush.horizontalGradient(listOf(Color(0xFFFF4081), Color(0xFFFF6E40))))
+                        .background(Brush.horizontalGradient(listOf(Mascot.color(0xFF6FB0FF), Color(0xFFFF6E40))))
                         .clickable {
                             scope.launch {
                                 UsbDacManager.setUsbDacMode(ctx, false)

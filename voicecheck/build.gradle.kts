@@ -1,24 +1,25 @@
-// Miku Voice Check: a dev tool for reviewing the generated voice clips and sound effects on the
+// Hione Voice Check: a dev tool for reviewing the generated voice clips and sound effects on the
 // device itself. Not part of the image; installed with adb. It bundles the clips straight from
-// ../mikuos/data at build time, so it always plays what the pipeline last rendered.
+// ../hioneos/data at build time, so it always plays what the pipeline last rendered.
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val soundsSrc = rootProject.file("../mikuos/data")
+val soundsSrc = rootProject.file("../hioneos/data")
 val genAssets = layout.buildDirectory.dir("generated/voicecheckAssets")
 val copySounds by tasks.registering(Copy::class) {
-    from(soundsSrc) { include("voice/**", "sfx/**", "sounds_index.json") }
+    // os_sounds: the HioneOS system sounds (tools/sounds/build_os_sounds.py), chimes and voices.
+    from(soundsSrc) { include("voice/**", "sfx/**", "sounds_index.json", "os_sounds/**/*.ogg", "os_sounds/index.json") }
     into(genAssets)
 }
 
 android {
-    namespace = "com.miku.voicecheck"
+    namespace = "com.hione.voicecheck"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.miku.voicecheck"
+        applicationId = "com.hione.voicecheck"
         minSdk = 30
         targetSdk = 34
         versionCode = 1
@@ -36,11 +37,11 @@ android {
     lint { abortOnError = false }
     applicationVariants.all {
         outputs.all {
-            if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) outputFileName = "MikuVoiceCheck.apk"
+            if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) outputFileName = "HioneVoiceCheck.apk"
         }
     }
 }
-tasks.matching { (it.name.startsWith("merge") && it.name.endsWith("Assets")) || it.name.contains("LintVital") }.configureEach { dependsOn(copySounds) }
+tasks.matching { (it.name.startsWith("merge") && it.name.endsWith("Assets")) || it.name.contains("LintVital", ignoreCase = true) }.configureEach { dependsOn(copySounds) }
 
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.09.02"))

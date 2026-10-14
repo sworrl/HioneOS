@@ -56,7 +56,7 @@ private sealed interface FmSheet {
 private val GAP = 4.dp
 
 @Composable
-fun MikuFMRadioScreen(onBack: () -> Unit) {
+fun HioneFMRadioScreen(onBack: () -> Unit) {
     val ctx = LocalContext.current
     val st by FmRadioManager.state.collectAsState()
     var sheet by remember { mutableStateOf<FmSheet>(FmSheet.None) }
@@ -192,7 +192,7 @@ private fun FmHeaderBar(
     ) {
         CyberIconButton(Icons.Default.ArrowBackIosNew, "Back", 40.dp, false, onBack)
         Text(
-            "MIKU CYBER FM TUNER", color = MikuCyan, fontSize = 11.sp,
+            "HIONE CYBER FM TUNER", color = HioneCyan, fontSize = 11.sp,
             fontWeight = FontWeight.Bold, fontFamily = AudiowideFont, letterSpacing = 1.sp
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -220,8 +220,8 @@ private fun FmHeaderBar(
 }
 
 @Composable
-fun CyberChip(text: String, ok: Boolean, accent: Color = MikuCyan) {
-    val c = if (ok) accent else MikuNeonPink
+fun CyberChip(text: String, ok: Boolean, accent: Color = HioneCyan) {
+    val c = if (ok) accent else HioneNeonPink
     Box(
         Modifier
             .glass(RoundedCornerShape(9.dp), accent = c, accent2 = c, fill = c.copy(alpha = 0.16f), rimAlpha = 0.9f, shine = 0.7f)
@@ -250,13 +250,13 @@ fun CyberIconButton(
     ) {
         Box(
             Modifier.size(size).glass(
-                CircleShape, accent = MikuCyan, accent2 = MikuPink,
-                fill = if (active) MikuCyan.copy(alpha = 0.26f) else Color(0xB00A1E26),
+                CircleShape, accent = HioneCyan, accent2 = HionePink,
+                fill = if (active) HioneCyan.copy(alpha = 0.26f) else Color(0xB00A1E26),
                 rimAlpha = if (active) 1f else 0.4f, shine = if (active) 1.4f else 0.9f,
             ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, label, tint = if (active) MikuCyan else MikuTextSecondary, modifier = Modifier.size(size * 0.48f))
+            Icon(icon, label, tint = if (active) HioneCyan else HioneTextSecondary, modifier = Modifier.size(size * 0.48f))
         }
     }
 }
@@ -268,19 +268,19 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
     val isFav = st.favorites.contains(st.frequencyKHz)
     val online = st.isHardwareOnline
     val statusColor = when {
-        online -> MikuCyan
-        st.hardwareError != null -> MikuNeonPink
+        online -> HioneCyan
+        st.hardwareError != null -> HioneNeonPink
         st.isPowerOn -> CyberAmber
         else -> Color.Gray
     }
     val pty = FmRadioManager.programmeTypeName(st.programmeType, st.band)
     val tuned = st.tunedStation
-    val accent = tuned?.let { stationColor(it.call) } ?: MikuCyan
+    val accent = tuned?.let { stationColor(it.call) } ?: HioneCyan
 
     Column(
         Modifier.fillMaxWidth()
             .glass(
-                RoundedCornerShape(16.dp), accent = if (st.isPowerOn) accent else Color.White, accent2 = MikuPink,
+                RoundedCornerShape(16.dp), accent = if (st.isPowerOn) accent else Color.White, accent2 = HionePink,
                 fill = Color(0xC80A1E26), rimAlpha = if (st.isPowerOn) 0.9f else 0.2f, rimWidth = 1.2.dp,
             )
             .padding(horizontal = 6.dp, vertical = 4.dp),
@@ -311,7 +311,7 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
         // Dial row: keypad and preset star flank the number as full-size thumb targets.
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).clip(CircleShape).pressable(onClick = onKeypad), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Dialpad, "Enter a frequency", tint = MikuTextSecondary, modifier = Modifier.size(22.dp))
+                Icon(Icons.Default.Dialpad, "Enter a frequency", tint = HioneTextSecondary, modifier = Modifier.size(22.dp))
             }
             Row(Modifier.weight(1f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Bottom) {
                 Text(
@@ -330,7 +330,7 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
                 Icon(
                     if (isFav) Icons.Default.Star else Icons.Default.StarBorder,
                     if (isFav) "Remove preset" else "Save as preset",
-                    tint = if (isFav) MikuNeonPink else MikuTextSecondary, modifier = Modifier.size(24.dp)
+                    tint = if (isFav) HioneNeonPink else HioneTextSecondary, modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -341,7 +341,8 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
             st.stationName.isNotEmpty() && pty != null -> "${st.stationName} · $pty"
             st.stationName.isNotEmpty() -> st.stationName
             tuned != null -> buildString {
-                append(tuned.call)
+                append(tuned.label)
+                tuned.altName?.let { append(" (").append(it).append(")") }
                 listOfNotNull(tuned.city, tuned.state).joinToString(", ").takeIf { it.isNotBlank() }?.let { append(" · ").append(it) }
             }
             st.rdsAvailable == false -> "No RDS on this station"
@@ -353,7 +354,7 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
                 .then(if (tuned != null) Modifier.pressable(pressedScale = 0.98f) { onStation(tuned) } else Modifier),
             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(headline, color = MikuTextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+            Text(headline, color = HioneTextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold,
                  maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
             tuned?.genre?.let { g ->
                 Spacer(Modifier.width(6.dp))
@@ -371,7 +372,7 @@ private fun FmFrequencyCard(st: FmState, onKeypad: () -> Unit, onStation: (FmSta
             else -> null
         }
         if (subline != null) {
-            Text(subline, color = MikuTextSecondary, fontSize = 8.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            Text(subline, color = HioneTextSecondary, fontSize = 8.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                  modifier = Modifier.padding(horizontal = 10.dp))
         }
     }
@@ -406,19 +407,19 @@ private fun FmPathStrip(
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                "PATH TO ${prof.station.call} · ${"%.1f".format(Locale.US, prof.distanceKm)} km · ${prof.verdict}",
-                color = MikuTeal.copy(alpha = 0.9f), fontSize = 8.sp, fontWeight = FontWeight.Bold,
+                "PATH TO ${prof.station.label} · ${"%.1f".format(Locale.US, prof.distanceKm)} km · ${prof.verdict}",
+                color = HioneTeal.copy(alpha = 0.9f), fontSize = 8.sp, fontWeight = FontWeight.Bold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                pathLevels(s, prof), color = MikuTextSecondary, fontSize = 7.sp,
+                pathLevels(s, prof), color = HioneTextSecondary, fontSize = 7.sp,
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
         if (s.reach != FmReach.Verdict.UNKNOWN) {
             Text(s.reach.shortLabel, color = s.reach.color, fontSize = 8.sp, fontWeight = FontWeight.Bold)
         }
-        Icon(Icons.Default.ExpandMore, "Show the terrain profile", tint = MikuTextSecondary, modifier = Modifier.size(18.dp))
+        Icon(Icons.Default.ExpandMore, "Show the terrain profile", tint = HioneTextSecondary, modifier = Modifier.size(18.dp))
     }
 }
 
@@ -452,20 +453,20 @@ private fun FmTransportRow(isPowerOn: Boolean, ctx: Context) {
             Modifier.size(56.dp)
                 .then(
                     if (isPowerOn) Modifier.clip(CircleShape)
-                        .background(Brush.verticalGradient(listOf(MikuCyan, Color(0xFF006978))))
+                        .background(Brush.verticalGradient(listOf(HioneCyan, Color(0xFF006978))))
                     else Modifier
                 )
                 .glass(
-                    CircleShape, accent = MikuCyan, accent2 = MikuPink,
+                    CircleShape, accent = HioneCyan, accent2 = HionePink,
                     fill = if (isPowerOn) Color.Transparent else Color(0xC00A1E26),
                     rimAlpha = if (isPowerOn) 1f else 0.5f, rimWidth = 1.5.dp, shine = 1.6f,
                 )
-                .pressable { if (isPowerOn) MikuFmService.stop(ctx) else MikuFmService.start(ctx) },
+                .pressable { if (isPowerOn) HioneFmService.stop(ctx) else HioneFmService.start(ctx) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 Icons.Default.PowerSettingsNew, if (isPowerOn) "Turn the radio off" else "Turn the radio on",
-                tint = if (isPowerOn) Color.Black else MikuTextSecondary, modifier = Modifier.size(26.dp)
+                tint = if (isPowerOn) Color.Black else HioneTextSecondary, modifier = Modifier.size(26.dp)
             )
         }
 
@@ -538,7 +539,7 @@ private fun FmGesturePill(ctx: Context) {
                         val duration = android.os.SystemClock.elapsedRealtime() - startTime
                         if (totalY < -30f) {
                             if (duration >= 250L || totalY < -100f) {
-                                ctx.packageManager.getLaunchIntentForPackage("com.miku.launcher")?.apply {
+                                ctx.packageManager.getLaunchIntentForPackage("com.hione.launcher")?.apply {
                                     putExtra("open_recents", true)
                                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
                                 }?.let { runCatching { ctx.startActivity(it) } }
@@ -559,7 +560,7 @@ private fun FmGesturePill(ctx: Context) {
     ) {
         Box(
             Modifier.width(60.dp).height(3.5.dp).clip(RoundedCornerShape(2.dp))
-                .background(MikuCyan.copy(alpha = 0.9f))
+                .background(HioneCyan.copy(alpha = 0.9f))
         )
     }
 }
@@ -577,19 +578,19 @@ private fun FmVolumeHud(level: Int) {
     if (!visible) return
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
-            Modifier.glass(RoundedCornerShape(16.dp), accent = MikuCyan, fill = Color(0xEE02090D), rimAlpha = 0.9f)
+            Modifier.glass(RoundedCornerShape(16.dp), accent = HioneCyan, fill = Color(0xEE02090D), rimAlpha = 0.9f)
                 .padding(horizontal = 20.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("TUNER VOLUME", color = MikuTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+            Text("TUNER VOLUME", color = HioneTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
             Spacer(Modifier.height(5.dp))
-            Text("$level", color = MikuCyan, fontSize = 26.sp, fontWeight = FontWeight.Black, fontFamily = AudiowideFont)
+            Text("$level", color = HioneCyan, fontSize = 26.sp, fontWeight = FontWeight.Black, fontFamily = AudiowideFont)
             Spacer(Modifier.height(6.dp))
-            Box(Modifier.width(150.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0x3300E5FF))) {
-                Box(Modifier.fillMaxWidth(level / 100f).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(MikuCyan))
+            Box(Modifier.width(150.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0x33FFC56B))) {
+                Box(Modifier.fillMaxWidth(level / 100f).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(HioneCyan))
             }
             Spacer(Modifier.height(4.dp))
-            Text("independent of media volume", color = MikuTextSecondary, fontSize = 7.sp)
+            Text("independent of media volume", color = HioneTextSecondary, fontSize = 7.sp)
         }
     }
 }
@@ -605,7 +606,7 @@ private fun FmViewModeChips(mode: QualcommFmHardwareEngine.ViewMode, modifier: M
             val on = mode == m
             Box(
                 Modifier.heightIn(min = 30.dp)
-                    .glass(RoundedCornerShape(8.dp), accent = MikuTeal, fill = if (on) MikuTeal else Color(0xCC03141B),
+                    .glass(RoundedCornerShape(8.dp), accent = HioneTeal, fill = if (on) HioneTeal else Color(0xCC03141B),
                            rimAlpha = if (on) 1f else 0.5f, shine = if (on) 1.2f else 0.6f)
                     .pressable { FmRadioManager.setViewMode(m) }
                     .padding(horizontal = 10.dp),
@@ -616,7 +617,7 @@ private fun FmViewModeChips(mode: QualcommFmHardwareEngine.ViewMode, modifier: M
                         QualcommFmHardwareEngine.ViewMode.LIVE -> "LIVE"
                         QualcommFmHardwareEngine.ViewMode.BAND -> if (on) "BAND · SCANNING" else "BAND"
                     },
-                    color = if (on) Color.Black else MikuTeal,
+                    color = if (on) Color.Black else HioneTeal,
                     fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                 )
             }
@@ -654,10 +655,10 @@ private fun FmBackdrop() {
 
 private fun bakeBackdrop(ctx: Context, w: Int, h: Int): androidx.compose.ui.graphics.ImageBitmap {
     val src = android.graphics.BitmapFactory.decodeResource(
-        ctx.resources, R.drawable.miku_bg_fm, android.graphics.BitmapFactory.Options().apply { inScaled = false })
+        ctx.resources, R.drawable.hione_bg_fm, android.graphics.BitmapFactory.Options().apply { inScaled = false })
     val out = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
     val c = android.graphics.Canvas(out)
-    c.drawColor(0xFF040D12.toInt())
+    c.drawColor(0xFF0C0D10.toInt())
     // Centre crop.
     val scale = maxOf(w / src.width.toFloat(), h / src.height.toFloat())
     val dw = src.width * scale
@@ -668,7 +669,7 @@ private fun bakeBackdrop(ctx: Context, w: Int, h: Int): androidx.compose.ui.grap
     val g = android.graphics.Paint().apply {
         shader = android.graphics.LinearGradient(
             0f, 0f, 0f, h.toFloat(),
-            intArrayOf(0xCC040D12.toInt(), 0x77000000, 0xF5040D12.toInt()), null,
+            intArrayOf(0xCC0C0D10.toInt(), 0x77000000, 0xF50C0D10.toInt()), null,
             android.graphics.Shader.TileMode.CLAMP)
     }
     c.drawRect(0f, 0f, w.toFloat(), h.toFloat(), g)
@@ -693,19 +694,19 @@ private fun FmScanButton(isScanning: Boolean, progress: Float, onClick: () -> Un
     val angle = t.animateFloat(0f, 360f, infiniteRepeatable(tween(1400, easing = LinearEasing)), label = "sweep")
     Box(Modifier.size(48.dp).pressable(onClick = onClick), contentAlignment = Alignment.Center) {
         Box(
-            Modifier.size(42.dp).glass(CircleShape, accent = MikuPink, accent2 = MikuCyan,
+            Modifier.size(42.dp).glass(CircleShape, accent = HionePink, accent2 = HioneCyan,
                 fill = Color(0xD0101C28), rimAlpha = 1f, shine = 1.4f)
         )
         androidx.compose.foundation.Canvas(Modifier.size(42.dp).graphicsLayer { rotationZ = angle.value }) {
             drawArc(
-                Brush.sweepGradient(listOf(Color.Transparent, MikuTeal.copy(alpha = 0.1f), MikuCyan.copy(alpha = 0.7f))),
+                Brush.sweepGradient(listOf(Color.Transparent, HioneTeal.copy(alpha = 0.1f), HioneCyan.copy(alpha = 0.7f))),
                 -90f, 90f, true, topLeft = androidx.compose.ui.geometry.Offset(4f, 4f),
                 size = androidx.compose.ui.geometry.Size(size.width - 8f, size.height - 8f)
             )
         }
         androidx.compose.foundation.Canvas(Modifier.size(42.dp)) {
             val sw = 2.5.dp.toPx()
-            drawArc(MikuPink, -90f, 360f * progress.coerceIn(0f, 1f), false,
+            drawArc(HionePink, -90f, 360f * progress.coerceIn(0f, 1f), false,
                 topLeft = androidx.compose.ui.geometry.Offset(sw / 2, sw / 2),
                 size = androidx.compose.ui.geometry.Size(size.width - sw, size.height - sw),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(sw, cap = androidx.compose.ui.graphics.StrokeCap.Round))

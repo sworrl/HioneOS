@@ -5,9 +5,9 @@ project("fmprojectm")
 # projectM background for the FM tuner (com.caf.fmradio).
 #
 # The library sources are NOT copied here. They are the same vendored libprojectM 4.2 tree that
-# Miku Music builds (app/src/main/cpp/vendor/projectm, itself a symlink to an external checkout),
+# Hione Music builds (app/src/main/cpp/vendor/projectm, itself a symlink to an external checkout),
 # referenced by relative path so there is one copy of the vendor tree in the repo. Only the JNI
-# wrapper is ours; the app's wrapper is bound to com.miku.player.ProjectMNative and cannot be
+# wrapper is ours; the app's wrapper is bound to com.hione.player.ProjectMNative and cannot be
 # reused across packages.
 #
 # Same staleness trap as the app: Gradle does not look inside the symlinked vendor dir, so after

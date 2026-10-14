@@ -19,7 +19,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 1016
-        versionName = "1.2.0-mikuos"
+        versionName = "1.2.0-hioneos"
 
         // projectM background (FmProjectMBackground.kt). arm64 only, like the vendor JNI.
         ndk { abiFilters += "arm64-v8a" }
@@ -31,7 +31,7 @@ android {
         }
     }
 
-    // libfmprojectm builds the SAME vendored libprojectM tree as Miku Music
+    // libfmprojectm builds the SAME vendored libprojectM tree as Hione Music
     // (app/src/main/cpp/vendor/projectm, referenced by relative path, not copied). Only the JNI
     // wrapper lives here. See src/main/cpp/CMakeLists.txt.
     externalNativeBuild {

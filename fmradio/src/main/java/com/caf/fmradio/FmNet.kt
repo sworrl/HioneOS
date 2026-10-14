@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit
  * This app runs in HiBy's vendor_fm_app SELinux domain (the one domain allowed to open
  * /dev/radio0), and that domain may not create sockets or reach the DNS resolver: measured on
  * 0.1.17, every request failed with "Permission denied (missing INTERNET permission?)" while
- * INTERNET was granted. So requests go to com.miku.sysbridge (system_app, which has the network)
+ * INTERNET was granted. So requests go to com.hione.sysbridge (system_app, which has the network)
  * as a signature-protected broadcast, and the answer comes back the same way. Blocking; call
  * off the main thread. Falls back to a direct connection when the bridge is not installed,
- * which is the case on anything that is not a MikuOS image.
+ * which is the case on anything that is not a HioneOS image.
  */
 object FmNet {
 
@@ -31,9 +31,9 @@ object FmNet {
         val text: String get() = String(body, Charsets.UTF_8)
     }
 
-    private const val BRIDGE = "com.miku.sysbridge"
-    private const val ACTION = "com.miku.sysbridge.HTTP"
-    private const val PERMISSION = "com.miku.permission.SYSTEM_BRIDGE"
+    private const val BRIDGE = "com.hione.sysbridge"
+    private const val ACTION = "com.hione.sysbridge.HTTP"
+    private const val PERMISSION = "com.hione.permission.SYSTEM_BRIDGE"
 
     private class Pending { val latch = CountDownLatch(1); var reply: Intent? = null }
     private val pending = ConcurrentHashMap<String, Pending>()

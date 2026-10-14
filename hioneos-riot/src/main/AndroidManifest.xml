@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <!-- Genres come from MediaStore directly; everything else is browsed through Hione Music. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!-- Wheel detents and key presses. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!-- Hand HOME back to the Hione launcher on exit. Platform signature permission; without it
+         the exit path falls back to clearing our own preferred activities. -->
+    <uses-permission android:name="android.permission.MANAGE_ROLE_HOLDERS" />
+
+    <queries>
+        <package android:name="com.hione.player" />
+        <package android:name="com.hione.launcher" />
+        <package android:name="com.caf.fmradio" />
+        <intent>
+            <action android:name="androidx.media3.session.MediaLibraryService" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.Riot">
+
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.hione.riot.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
+
+        <!--
+          The shell. HOME + DEFAULT so it can be picked as the launcher. No LAUNCHER category on
+          purpose: it is an easter egg, reached from the BPM game's Secrets list (ENTER below).
+        -->
+        <activity
+            android:name=".RiotActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:stateNotNeeded="true"
+            android:excludeFromRecents="false"
+            android:resizeableActivity="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|uiMode"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          The unlock contract. The launcher (or adb) starts this action, com.hione.riot.action.ENTER.
+          A boolean extra "force" set to true skips the unlock check (debug only).
+        -->
+        <activity-alias
+            android:name=".Enter"
+            android:exported="true"
+            android:targetActivity=".RiotActivity">
+            <intent-filter>
+                <action android:name="com.hione.riot.action.ENTER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+    </application>
+</manifest>

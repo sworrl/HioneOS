@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- USB DAC mode is switched by com.miku.sysbridge (system UID); see UsbDacManager. -->
-    <uses-permission android:name="com.miku.permission.SYSTEM_BRIDGE" />
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <!-- USB DAC mode is switched by com.hione.sysbridge (system UID); see UsbDacManager. -->
+    <uses-permission android:name="com.hione.permission.SYSTEM_BRIDGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- DAC graph: "Measure with the mic" records a sine sweep with the built-in mic (asked at use). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <!--
-      Position, for MikuLocationFusion. ACCESS_FINE_LOCATION is Android's gate on reading Wi-Fi
+      Position, for HioneLocationFusion. ACCESS_FINE_LOCATION is Android's gate on reading Wi-Fi
       scan results as much as it is on GNSS, so Wi-Fi positioning needs it too. The passive
       provider is used for GNSS, so holding this does not mean the GNSS engine is running: it
       means we are told about fixes other apps already paid for.
@@ -41,6 +54,13 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
+    <!-- Blackjack Monitor (BlackjackMonitor.kt), read-only. READ_LOGS: the kernel log carries the
+         driver's power events and one line per register write. DUMP: AudioFlinger's output
+         threads, for the rate Android sends. MODIFY_AUDIO_ROUTING: unanonymized playback
+         configs, the fallback for that rate. All three are granted to the platform signature. -->
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.DUMP" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_ROUTING" />
 
     <application
         android:allowBackup="true"
@@ -49,6 +69,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.M500Hardware">
+
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.m500.hardware.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
 
         <!-- Main M500 Hardware & DAC Settings (Integrated into System Settings) -->
         <activity
@@ -60,10 +88,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-            <!-- The one DAC settings page on MikuOS. Miku Music, MikuSettings, the launcher and
+            <!-- The one DAC settings page on HioneOS. Hione Music, HioneSettings, the launcher and
                  the SystemUI DAC tiles (long-press) all open this. -->
             <intent-filter>
-                <action android:name="com.miku.action.DAC_SETTINGS" />
+                <action android:name="com.hione.action.DAC_SETTINGS" />
                 <action android:name="com.m500.hardware.action.DAC_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -91,10 +119,24 @@
                 android:value="-100" />
         </activity>
 
+        <!-- Blackjack Monitor: which DAC driver runs and what it is doing. Read-only. Opened from
+             the DAC page's driver card and from HioneSettings > About. -->
+        <activity
+            android:name=".BlackjackMonitorActivity"
+            android:exported="true"
+            android:label="Blackjack Monitor"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.M500Hardware">
+            <intent-filter>
+                <action android:name="com.hione.action.BLACKJACK_MONITOR" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- Bespoke Verbose USB DAC Mode Activity -->
         <activity
             android:name=".UsbDacActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="M500 USB DAC"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.M500Hardware">
@@ -109,7 +151,7 @@
         <!-- Fullscreen Cyber Pocket Lock HUD Overlay -->
         <activity
             android:name=".PocketHudActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="Pocket Lock HUD"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.M500Hardware.Translucent">
@@ -143,11 +185,12 @@
         </service>
 
 
-        <!-- Exported so the baked boot-exec (shell) can start it; foreground so
-             A14 does not reap the screen-on receiver it hosts. -->
+        <!-- Started by sysbridge BootSeeds (system uid) and the launcher, both HioneOS-signed.
+             Foreground so A14 does not reap the screen-on receiver it hosts. -->
         <service
             android:name=".AmbientBrightnessService"
             android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE"
             android:foregroundServiceType="camera|specialUse"
             android:description="@string/app_name">
             <property
@@ -157,7 +200,7 @@
 
         <service
             android:name=".PocketLockService"
-            android:exported="true"
+            android:exported="false"
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
@@ -165,9 +208,12 @@
         </service>
 
 
+        <!-- FN_BUTTON_STATE_CHANGE comes from system_server, which passes any permission check.
+             The permission stops other apps faking the cover switch or pocket lock. -->
         <receiver
             android:name=".PocketLockReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
             <intent-filter>
                 <action android:name="FN_BUTTON_STATE_CHANGE" />
             </intent-filter>

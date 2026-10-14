@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    HioneMedia: the Gallery, Camera and Recorder that replace AOSP Gallery2, Qualcomm Snapcam and
+    SoundRecorder in the HioneOS image. One APK, three launcher icons.
+
+    The intent filters below are copied from what the stock apps on this image actually register
+    (dumped from Gallery2.apk and SnapdragonCamera.apk in system.img), so removing the stock apps
+    leaves no action without a handler. Where a stock filter was dropped on purpose the comment
+    says so.
+
+    Each launcher activity has its own taskAffinity. Without that, all three would share the
+    package's default task: open Camera, go home, open Gallery, and Gallery would land on top of
+    the camera task instead of in its own Recents card.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!-- Android 14 partial photo access: if the user picks "Select photos", this is what is
+         granted instead of READ_MEDIA_IMAGES/VIDEO and the gallery shows the chosen subset. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <!-- Without it MediaStore strips GPS tags from EXIF before we can read them for the Info sheet. -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher_gallery"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HioneMedia"
+        android:largeHeap="false">
+
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.hione.media.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
+
+        <!-- ============================== GALLERY ============================== -->
+        <activity
+            android:name=".gallery.GalleryActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_gallery"
+            android:label="@string/gallery_label"
+            android:taskAffinity="com.hione.media.gallery"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
+        </activity>
+
+        <!-- Single-item viewer, the target of every "open this photo/video" intent. Stock Gallery2
+             split this between GalleryActivity (images) and MovieActivity (video); one activity
+             does both here. Stock also accepted http(s) URLs and rtsp/HLS streams; those are left
+             out on purpose: browsers download images themselves, and this app holds no INTERNET
+             permission. -->
+        <activity
+            android:name=".gallery.ViewerActivity"
+            android:exported="true"
+            android:label="@string/gallery_label"
+            android:icon="@mipmap/ic_launcher_gallery"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.HioneMedia.Viewer">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="com.android.camera.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/vnd.google.panorama360+jpg" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="com.android.camera.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <!-- MediaStore.ACTION_REVIEW / ACTION_REVIEW_SECURE: what a camera app sends when the
+                 user taps its thumbnail (Camera Go uses these). The secure variant is shown over
+                 the lock screen and limited to the items the camera passed in. -->
+            <intent-filter>
+                <action android:name="android.provider.action.REVIEW" />
+                <action android:name="android.provider.action.REVIEW_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- Stock Gallery2's Wallpaper activity registered SET_WALLPAPER only; ATTACH_DATA is the
+             "Use as" / "Set as" entry other apps (Files, browsers) offer for an image. -->
+        <activity
+            android:name=".gallery.WallpaperActivity"
+            android:exported="true"
+            android:label="@string/wallpaper_label"
+            android:icon="@mipmap/ic_launcher_gallery"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.HioneMedia.Dialog">
+            <intent-filter android:label="@string/wallpaper_label">
+                <action android:name="android.intent.action.ATTACH_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter android:label="@string/gallery_label">
+                <action android:name="android.intent.action.SET_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- com.android.camera.action.CROP is not a public API but Settings (user photo), Contacts
+             and plenty of third-party apps still send it, and Gallery2 was its only handler on
+             this image. EDIT image/* is Gallery2's FilterShowActivity entry; here it opens the
+             same crop/rotate editor and saves a copy. -->
+        <activity
+            android:name=".gallery.CropActivity"
+            android:exported="true"
+            android:label="@string/crop_label"
+            android:icon="@mipmap/ic_launcher_gallery"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode">
+            <intent-filter android:label="@string/crop_label">
+                <action android:name="com.android.camera.action.CROP" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+                <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter android:label="@string/edit_label">
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- ============================== CAMERA ============================== -->
+        <!-- One activity for the launcher and every capture intent. The capture-for-result
+             actions run inside the caller's task (they arrive without NEW_TASK), so the
+             affinity below only applies to the launcher and STILL_IMAGE/VIDEO_CAMERA. Portrait
+             is locked because the camera UI is laid out for the 720x1280 panel; photos still
+             come out the right way up because the capture rotation follows the sensor. -->
+        <activity
+            android:name=".camera.CameraActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_camera"
+            android:label="@string/camera_label"
+            android:taskAffinity="com.hione.media.camera"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.HioneMedia.Camera">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.VIDEO_CAMERA" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.IMAGE_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.VIDEO_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Lock-screen camera (power double-press, lock-screen affordance). Shown over the
+             keyguard; the review it opens is limited to photos taken in this session. -->
+        <activity
+            android:name=".camera.SecureCameraActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_camera"
+            android:label="@string/camera_label"
+            android:taskAffinity="com.hione.media.securecamera"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.HioneMedia.Camera">
+            <intent-filter>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.IMAGE_CAPTURE_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- ============================== RECORDER ============================== -->
+        <activity
+            android:name=".recorder.RecorderActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_recorder"
+            android:label="@string/recorder_label"
+            android:taskAffinity="com.hione.media.recorder"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.provider.MediaStore.RECORD_SOUND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- AOSP SoundRecorder offered itself to "attach a voice clip" pickers for exactly
+                 these two types (MMS-era AMR). Kept so those pickers still find a recorder. -->
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="audio/amr" />
+                <data android:mimeType="audio/3gpp" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".recorder.RecorderService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+    </application>
+</manifest>

@@ -60,7 +60,7 @@ fun FmSignalMeter(st: FmState, modifier: Modifier = Modifier) {
 
     Row(
         modifier.fillMaxWidth()
-            .glass(RoundedCornerShape(14.dp), accent = MikuTeal, accent2 = MikuPink, fill = Color(0xB807161D), rimAlpha = 0.4f, shine = 0.8f)
+            .glass(RoundedCornerShape(14.dp), accent = HioneTeal, accent2 = HionePink, fill = Color(0xB807161D), rimAlpha = 0.4f, shine = 0.8f)
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -88,7 +88,7 @@ private fun FmSignalDial(value: Float, peak: Float, online: Boolean, modifier: M
         val sweep = 180f
         drawArc(
             brush = Brush.horizontalGradient(
-                listOf(Color(0xFF7A2140), Color(0xFF7A6A21), Color(0xFF00E5FF))
+                listOf(Color(0xFF7A2140), Color(0xFF7A6A21), Color(0xFFFFC56B))
             ),
             startAngle = 180f, sweepAngle = sweep, useCenter = false,
             topLeft = Offset(cx - r, cy - r), size = Size(r * 2, r * 2),
@@ -100,7 +100,7 @@ private fun FmSignalDial(value: Float, peak: Float, online: Boolean, modifier: M
             val a = Math.toRadians((180f + sweep * i / 5f).toDouble())
             val inner = r - 6.dp.toPx()
             drawLine(
-                MikuTeal.copy(alpha = 0.45f),
+                HioneTeal.copy(alpha = 0.45f),
                 Offset(cx + (inner * cos(a)).toFloat(), cy + (inner * sin(a)).toFloat()),
                 Offset(cx + (r * cos(a)).toFloat(), cy + (r * sin(a)).toFloat()),
                 strokeWidth = 1f
@@ -113,7 +113,7 @@ private fun FmSignalDial(value: Float, peak: Float, online: Boolean, modifier: M
         if (peak > 0.01f) {
             val pa = Math.toRadians((180f + sweep * peak).toDouble())
             drawLine(
-                MikuNeonPink.copy(alpha = 0.85f),
+                HioneNeonPink.copy(alpha = 0.85f),
                 Offset(cx, cy),
                 Offset(cx + (r * cos(pa)).toFloat(), cy + (r * sin(pa)).toFloat()),
                 strokeWidth = 1.5.dp.toPx(), cap = StrokeCap.Round
@@ -122,12 +122,12 @@ private fun FmSignalDial(value: Float, peak: Float, online: Boolean, modifier: M
 
         val na = Math.toRadians((180f + sweep * value).toDouble())
         drawLine(
-            MikuCyan,
+            HioneCyan,
             Offset(cx, cy),
             Offset(cx + ((r - 2f) * cos(na)).toFloat(), cy + ((r - 2f) * sin(na)).toFloat()),
             strokeWidth = 2.5.dp.toPx(), cap = StrokeCap.Round
         )
-        drawCircle(MikuCyan, radius = 3.dp.toPx(), center = Offset(cx, cy))
+        drawCircle(HioneCyan, radius = 3.dp.toPx(), center = Offset(cx, cy))
     }
 }
 
@@ -148,7 +148,7 @@ private fun FmSignalNumbers(st: FmState, rssi: Int) {
 @Composable
 private fun Num(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, color = MikuTextSecondary, fontSize = 6.5.sp, fontFamily = AudiowideFont)
+        Text(label, color = HioneTextSecondary, fontSize = 6.5.sp, fontFamily = AudiowideFont)
         Text(value, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
     }
 }
@@ -169,17 +169,17 @@ private fun FmSignalPills(st: FmState) {
                 st.isStereo == false -> "MONO"
                 else -> "STEREO ?"
             },
-            st.isStereo == true, MikuPurple
+            st.isStereo == true, HionePurple
         )
         CyberChip(
             when (st.rdsAvailable) { true -> "RDS"; false -> "NO RDS"; null -> "RDS ?" },
-            st.rdsAvailable == true, MikuTeal
+            st.rdsAvailable == true, HioneTeal
         )
-        if (st.diagnostics.halLoopback == true) CyberChip("AUDIO PATH", true, MikuTeal)
+        if (st.diagnostics.halLoopback == true) CyberChip("AUDIO PATH", true, HioneTeal)
         Spacer(Modifier.weight(1f))
         Text(
             st.diagnostics.routeLabel.uppercase(Locale.US),
-            color = MikuTextSecondary, fontSize = 6.5.sp, fontFamily = AudiowideFont
+            color = HioneTextSecondary, fontSize = 6.5.sp, fontFamily = AudiowideFont
         )
     }
 }

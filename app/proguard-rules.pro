@@ -1,4 +1,4 @@
-# Miku Music — release R8/ProGuard rules.
+# Hione Music — release R8/ProGuard rules.
 #
 # Media3/ExoPlayer, Compose, Kotlin coroutines, and androidx.security (Tink) all ship their own
 # consumer-rules.pro bundled inside their AARs, auto-applied by AGP — no manual keep rules needed

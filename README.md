@@ -11,30 +11,26 @@
   <img alt="Status" src="https://img.shields.io/badge/status-daily%20driver-2B2F38">
 </p>
 
-> **Work in progress, and help is wanted.** This is one person and one device. The HioneOS source
-> isn't public yet, so there's no issue tracker for it. Email github@falcontechnix.com. The
-> [What is verified](#what-is-verified) table is the honest line between what's been confirmed on
-> hardware and what hasn't, and the things that would help most are under
+> **Work in progress, and help is wanted.** This is one person and one device. Issues and pull
+> requests are welcome. The [What is verified](#what-is-verified) table is the honest line between
+> what's been confirmed on hardware and what hasn't, and the things that would help most are under
 > [Contributing](#contributing).
 
 HioneOS replaces the software on a HiBy Digital M500 DAP. Home screen, system UI, navigation,
 settings, hardware controls, the FM radio, the clock, calculator, calendar, camera, gallery,
-recorder and the Hione Hits player are ours, re-signed with a platform key you generate yourself,
+recorder and the [Hione Hits](https://github.com/sworrl/HioneHits) player are ours, re-signed with a platform key you generate yourself,
 so they run with platform permissions on a device that isn't rooted and doesn't need to be. Since
 2026-10-10 the DAC driver is ours too, and since 2026-10-11 the status LED driver.
 
 Earlier releases were called MikuOS. The rename happened on 2026-10-11. See [Legal](#legal) for
 what that means.
 
-This README describes HioneOS 0.4.4, the image on the author's M500 since 2026-10-11.
+This README describes HioneOS 0.4.6, the image on the author's M500 since 2026-10-14.
 
-**Names on 0.4.x devices.** The apps show their Hione names, but their package IDs are still
-`com.miku.*`, and so are settings keys, build switches, file names and source folders. HioneOS
-0.5.0 moves the packages to `com.hione.*`, with a data migration so nothing is lost: the old apps
-export, the new ones import on first run, and `miku_*` settings get copied to `hione_*`. Windy
-keys have to be entered again, since they're tied to the old app. 0.5.0 is in progress and hasn't
-shipped. Wherever this README names a package, a setting or a file, it's the name that's on a 0.4.x
-device today.
+**Package namespace migration.** HioneOS 0.4.6 completes the move to `com.hione.*` package IDs,
+with automatic data migration and self-healing recovery so nothing is lost: liked tracks, cumulative
+heart counts, play history, play counts, and listening statistics are automatically recovered on
+first launch.
 
 **Why it exists.** The M500 is a very good piece of audio hardware running software that gets in
 its way. On stock firmware HiBy Music gets a direct output and every other player goes through
@@ -51,13 +47,12 @@ instead of asking a root daemon for them. A `su` failure in this codebase is tre
 the code, not a reason to install a root daemon.
 
 <p align="center">
-  <img src="docs/screenshots/09-launcher-home.png" width="30%" alt="Launcher home: clock, weather, sun times and an NWS alert, the DAC badge, track count and battery tiles">
+  <img src="docs/screenshots/09-launcher-home.png" width="30%" alt="Launcher home: clock, weather, sun times, the DAC badge, track count and battery tiles">
   <img src="docs/screenshots/07-hardware-observatory.png" width="30%" alt="Hardware, read live: chip and RAM, the OS build and every app's version, BPM game rewards, the DAC state">
-  <img src="docs/screenshots/08-bpm-game-played.png" width="30%" alt="The BPM rhythm game mid-run: 184 BPM analyzed, a 24-tap streak, full crowd meter">
+  <img src="docs/screenshots/08-bpm-game-played.png" width="30%" alt="The BPM rhythm game mid-run on a 2-lane note highway">
 </p>
 
-The screenshots in this README were taken on 0.3.0, before the rename, so they still show the old
-theme. New ones come with 0.5.0.
+The screenshots above were captured on HioneOS 0.4.6 on the HiBy Digital M500.
 
 ---
 
@@ -190,8 +185,7 @@ confirmed on 2026-10-10.
 
 ## Since the clean-room drivers
 
-The short version of what changed between MikuOS 0.4.0 and HioneOS 0.4.4, all between the evening
-of 2026-10-10 and 2026-10-11.
+The short version of what changed between MikuOS 0.4.0 and HioneOS 0.4.6.
 
 - **0.4.1: Blackjack.** Our own DAC driver replaced HiBy's pair. First boot clean, both DACs
   answer, and the DAC runs at the track's own rate for the 48kHz family. The 0.4.1 apps added a
@@ -204,8 +198,12 @@ of 2026-10-10 and 2026-10-11.
   set to legacy mode, so the M500 can be reached from the LAN while it's idle (not confirmed yet).
 - **0.4.4: the status light earns its keep.** Format colours per track and a pulse on the beat,
   both confirmed on the device on 2026-10-11. Blackjack Monitor in the Hardware app.
-- **2026-10-11: the rename.** MikuOS became HioneOS and Miku Music became Hione Hits. The package
-  move is 0.5.0.
+- **2026-10-11: the rename.** MikuOS became HioneOS and Miku Music became Hione Hits.
+- **0.4.6: namespace migration, multi-lane BPM highway, and DankPods easter eggs.** Package IDs
+  moved to `com.hione.*` with automatic recovery of liked songs, heart counts, and play history.
+  Added a phase-locked multi-lane note highway with per-lane fret validation and power chords,
+  non-blocking unlock banners, PKCELL battery icon, Frank the Snake arcade game, 1-Grit screen
+  smash animation, and enlarged typography across Hardware and Settings screens.
 
 Alongside that, clean-room specs were written for most of the rest of HiBy's closed drivers, and
 reading those binaries turned up a few things that shouldn't be in a shipping firmware. See
@@ -219,7 +217,6 @@ reading those binaries turned up a few things that shouldn't be in a shipping fi
 There's no prebuilt image to download, and there won't be one. A HioneOS super image contains
 HiBy Digital's system and vendor firmware, which isn't ours to hand out. You build it from the
 stock firmware you already have on your own device. See [Building an image](#building-an-image).
-The build needs the HioneOS source, which isn't public yet.
 
 Once you have an image, there are two ways to put it on the device.
 

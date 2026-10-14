@@ -14,10 +14,12 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
- * Every broadcast station in North America, and which of them should reach you here.
+ * Every broadcast station in North America and every FM station in Japan, and which of them
+ * should reach you here.
  *
- * The catalogue is 47,826 stations built from FCC public-record data (see tools/radiodb) and
- * baked into the image at /system_ext/etc/miku/stations.sqlite. Each row carries the
+ * The North American rows are FCC public-record data and the Japanese rows come from Japanese
+ * Wikipedia and MLIT place data (see tools/radiodb/README.md). The catalogue is
+ * baked into the image at /system_ext/etc/hione/stations.sqlite. Each row carries the
  * transmitter's coordinates, ERP and HAAT, so "what is on 100.1 here" is a lookup rather than
  * a guess, and so the band display can label a peak with the call sign that produced it.
  *
@@ -31,8 +33,8 @@ object FmStationCatalogue {
 
     private const val TAG = "FmStationCatalogue"
     private val PATHS = listOf(
-        "/system_ext/etc/miku/stations.sqlite",
-        "/system/etc/miku/stations.sqlite",
+        "/system_ext/etc/hione/stations.sqlite",
+        "/system/etc/hione/stations.sqlite",
         "/data/local/tmp/stations.sqlite",      // for trying a newer catalogue without a flash
     )
 
@@ -79,7 +81,42 @@ object FmStationCatalogue {
         val rcamslM: Double? = null,
         /** Where [measuredDbuv] came from: [MEASURED_TUNED] or [MEASURED_SWEEP]. */
         val measuredSource: String? = null,
+        /** ISO country from the catalogue (US, CA, MX, JP, ...). */
+        val country: String? = null,
+        /** English or romaji name, where the source has one (Japanese rows: "NHK-FM Tokyo"). */
+        val name: String? = null,
+        /** Japanese name (Japanese rows: "NHK-FM 東京", "FMいるか"). */
+        val nameJa: String? = null,
+        /** The main station a relay carries (Japanese rows). */
+        val parentCall: String? = null,
+        /** How the transmitter was placed: "wikipedia", "oaza" or "municipality" (Japanese rows). */
+        val sitePrecision: String? = null,
+        /** ERP worked out from transmitter power by the catalogue's rule, not stated. */
+        val erpEstimated: Boolean = false,
+        /** HAAT from a class-rule mast height over real ground, not a licensed figure. */
+        val haatEstimated: Boolean = false,
     ) {
+        val isJapan: Boolean get() = country == "JP"
+
+        /**
+         * What a chip or row calls the station. A US station is its call sign. A Japanese row is
+         * its name, because most Japanese relays have no public call sign of their own and the
+         * catalogue's id for them is synthetic.
+         */
+        val label: String get() = when {
+            isJapan -> nameJa ?: name ?: call
+            else -> call
+        }
+
+        /** Short form for a 128 dp chip: "WDVE", or the Japanese name without the network prefix. */
+        val chipLabel: String get() = when {
+            isJapan -> (nameJa ?: name ?: call).replace("NHK-FM ", "NHK ")
+            else -> call.substringBefore("-FM")
+        }
+
+        /** Second name for a Japanese row (romaji/English), null when there is none or no need. */
+        val altName: String? get() = if (isJapan) name?.takeIf { it != nameJa } else null
+
         /** Words for [measuredSource], for the UI. */
         val measuredWhere: String get() = when (measuredSource) {
             MEASURED_TUNED -> "read while tuned here"
@@ -99,10 +136,13 @@ object FmStationCatalogue {
         }
         val mhz: Double get() = khz / 1000.0
         /** How the UI should describe the kind of station, in words rather than FCC codes. */
-        val kind: String get() = when (service) {
-            "FX" -> "translator"
-            "FL" -> "low power"
-            "AM" -> "AM"
+        val kind: String get() = when {
+            isJapan && service == "FX" -> "relay"
+            isJapan && service == "FL" -> "community"
+            isJapan && service == "FM" -> "main"
+            service == "FX" -> "translator"
+            service == "FL" -> "low power"
+            service == "AM" -> "AM"
             else -> "full power"
         }
     }
@@ -211,10 +251,14 @@ object FmStationCatalogue {
 
     private fun formatsPresent(d: SQLiteDatabase): Boolean = "genre" in columnsOf(d)
 
+    private fun col(d: SQLiteDatabase, c: String) = if (c in columnsOf(d)) c else "NULL"
+
+    /** Column order is what [stationFrom] reads by index; missing columns read as NULL. */
     private fun selectColumns(d: SQLiteDatabase): String =
         "call,service,khz,city,state,licensee,lat,lon,erp_kw,haat_m,callsign_since," +
             (if (formatsPresent(d)) "format,genre" else "NULL,NULL") +
-            (if ("rcamsl_m" in columnsOf(d)) ",rcamsl_m" else ",NULL")
+            "," + listOf("rcamsl_m", "country", "name", "name_ja", "parent_call", "site_precision",
+                         "erp_estimated", "haat_estimated").joinToString(",") { col(d, it) }
 
     private fun stationFrom(c: android.database.Cursor, lat: Double, lon: Double): Station {
         val sLat = c.getDouble(6); val sLon = c.getDouble(7)
@@ -231,6 +275,10 @@ object FmStationCatalogue {
                 20 * log10(km.coerceAtLeast(1.0)),
             format = c.getString(11), genre = c.getString(12),
             rcamslM = if (c.isNull(13)) null else c.getDouble(13),
+            country = c.getString(14), name = c.getString(15), nameJa = c.getString(16),
+            parentCall = c.getString(17), sitePrecision = c.getString(18),
+            erpEstimated = !c.isNull(19) && c.getInt(19) != 0,
+            haatEstimated = !c.isNull(20) && c.getInt(20) != 0,
         )
     }
 
@@ -245,19 +293,14 @@ object FmStationCatalogue {
         val d = open() ?: return emptyList()
         val q = query.trim()
         if (q.isEmpty()) return emptyList()
-        val freq = q.removeSuffix("FM").removeSuffix("fm").trim().toDoubleOrNull()?.let {
-            when {
-                it in 87.0..108.0 -> (it * 1000).toInt()
-                it in 870.0..1080.0 -> (it * 100).toInt()     // "945" for 94.5
-                else -> null
-            }
-        }
+        val freq = parseSearchFrequencyKHz(q)
         val like = "%${q.replace("%", "").replace("_", "")}%"
         val where = StringBuilder("service IN ('FM','FX','FL') AND lat IS NOT NULL AND (")
         val args = ArrayList<String>()
         if (freq != null) { where.append("khz BETWEEN ? AND ? OR "); args += (freq - 50).toString(); args += (freq + 50).toString() }
         where.append("call LIKE ? OR city LIKE ? OR licensee LIKE ?")
         repeat(3) { args += like }
+        for (c in listOf("name", "name_ja")) if (c in columnsOf(d)) { where.append(" OR $c LIKE ?"); args += like }
         if (formatsPresent(d)) { where.append(" OR format LIKE ? OR genre LIKE ?"); repeat(2) { args += like } }
         where.append(")")
         val out = ArrayList<Station>()
@@ -273,11 +316,38 @@ object FmStationCatalogue {
         )).take(limit)
     }
 
-    /** Where MikuLocationFusion last put us, or null if nothing has placed the device yet. */
+    /**
+     * A typed frequency as kHz: "94.5", "94.5 FM", "945" (94.5), "76.3" or "763" (Japan).
+     * Anything outside 76.0-108.0 MHz is not a frequency here.
+     */
+    fun parseSearchFrequencyKHz(q: String): Int? =
+        q.trim().removeSuffix("MHz").removeSuffix("FM").removeSuffix("fm").trim().toDoubleOrNull()?.let {
+            when {
+                it in 76.0..108.0 -> Math.round(it * 1000).toInt()
+                it in 760.0..1080.0 -> Math.round(it * 100).toInt()     // "945" for 94.5
+                else -> null
+            }
+        }
+
+    /**
+     * Which country's stations surround this spot: the most common country among the nearest
+     * dozen catalogued FM transmitters within [radiusKm], or null when there are none. This is
+     * what picks the band plan automatically, so a US listener near the coast is never moved to
+     * Japan by a stray row and a listener in Japan is never left on 87.5-108.
+     */
+    fun countryNear(lat: Double, lon: Double, radiusKm: Double = 150.0): String? {
+        val d = open() ?: return null
+        if ("country" !in columnsOf(d)) return null
+        val got = near(lat, lon, radiusKm = radiusKm, services = listOf("FM", "FX", "FL"), limit = 400)
+            .sortedBy { it.distanceKm }.take(12)
+        return got.mapNotNull { it.country }.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+    }
+
+    /** Where HioneLocationFusion last put us, or null if nothing has placed the device yet. */
     fun listenerPosition(ctx: Context): Pair<Double, Double>? = runCatching {
         val cr = ctx.contentResolver
-        val lat = Settings.Global.getString(cr, "miku_loc_lat")?.toDoubleOrNull()
-        val lon = Settings.Global.getString(cr, "miku_loc_lon")?.toDoubleOrNull()
+        val lat = Settings.Global.getString(cr, "hione_loc_lat")?.toDoubleOrNull()
+        val lon = Settings.Global.getString(cr, "hione_loc_lon")?.toDoubleOrNull()
         if (lat == null || lon == null) null else lat to lon
     }.getOrNull()
 

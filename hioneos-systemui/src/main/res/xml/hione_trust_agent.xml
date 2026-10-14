@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HioneOS trust agent (trust/HioneTrustAgent). No settings screen: it is controlled from
+     HioneSettings > Security > Screen lock. -->
+<trust-agent xmlns:android="http://schemas.android.com/apk/res/android" />

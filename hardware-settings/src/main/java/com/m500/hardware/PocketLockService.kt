@@ -134,11 +134,11 @@ class PocketLockService : Service() {
                 val volBg = GradientDrawable().apply {
                     setColor(Color.parseColor("#13222E"))
                     cornerRadius = dp(8f)
-                    setStroke(dp(1f).toInt(), Color.parseColor("#4D00E5FF"))
+                    setStroke(dp(1f).toInt(), Mascot.argb(Color.parseColor("#4DFFC56B")))
                 }
                 val volView = TextView(this).apply {
                     text = "Volume wheel still works"
-                    setTextColor(Color.parseColor("#00E5FF"))
+                    setTextColor(Mascot.argb(Color.parseColor("#FFC56B")))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
                     paint.isFakeBoldText = true
                     gravity = Gravity.CENTER

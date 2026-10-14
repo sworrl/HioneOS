@@ -101,7 +101,7 @@ object FmWeatherRadio {
             "https://api.weather.gov/alerts/active?point=%.4f,%.4f".format(java.util.Locale.US, lat, lon),
             headers = mapOf(
                 // NWS asks every client to identify itself.
-                "User-Agent" to "MikuOS FM (https://github.com/sworrl/MikuOS)",
+                "User-Agent" to "HioneOS FM (https://github.com/sworrl/HioneOS)",
                 "Accept" to "application/geo+json",
             ),
         )

@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""Publish MikuOS app updates for Miku Update (com.miku.update).
+"""Publish HioneOS app updates for Hione Update (com.hione.update).
 
-Collects the release APKs of MikuOS's own apps from the Gradle build outputs, writes a channel
+Collects the release APKs of HioneOS's own apps from the Gradle build outputs, writes a channel
 manifest, signs it with the OTA key from the vault, verifies the signature with the public key,
 and stages everything in a directory that mirrors the server. With --upload it also pushes the
-staged files to the server that hosts mikuos.falcontechnix.com and checks the live copy.
+staged files to the server that hosts hioneos.falcontechnix.com and checks the live copy.
 
     # look at what would be published, sign with a throwaway key, touch nothing else
-    mikuos/ota/publish.py --channel dev --changelog notes.txt --dry-run
+    hioneos/ota/publish.py --channel dev --changelog notes.txt --dry-run
 
-    # real signature, staged in mikuos/ota/out, nothing uploaded (good for a LAN test)
-    mikuos/ota/publish.py --channel dev --changelog notes.txt
+    # real signature, staged in hioneos/ota/out, nothing uploaded (good for a LAN test)
+    hioneos/ota/publish.py --channel dev --changelog notes.txt
 
     # real signature and upload
-    mikuos/ota/publish.py --channel stable --changelog notes.txt --upload
+    hioneos/ota/publish.py --channel stable --changelog notes.txt --upload
 
 Stdlib only, plus the openssl CLI, aapt2 and apksigner. See README.md next to this file.
 
@@ -39,48 +39,48 @@ from pathlib import Path
 
 # ----------------------------------------------------------------------------------------------
 # Configuration. Host and paths are the ones the web installer is deployed with
-# (~/Documents/GitHub/webdev/mikuos-site/publish.sh rsyncs mikuos.falcontechnix.com to rieska).
+# (~/Documents/GitHub/webdev/hioneos-site/publish.sh rsyncs hioneos.falcontechnix.com to rieska).
 # ----------------------------------------------------------------------------------------------
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
-MODULES_DIR = REPO / "miku-player-kotlin"
-BUILD_SCRIPT = REPO / "mikuos" / "build" / "build_mikuos_super.sh"
+MODULES_DIR = REPO / "hione-player-kotlin"
+BUILD_SCRIPT = REPO / "hioneos" / "build" / "build_hioneos_super.sh"
 KEYS_DIR = HERE / "keys"
 PUBKEYS = {
     "primary": KEYS_DIR / "ota-signing-primary-p521.pub.pem",
     "backup": KEYS_DIR / "ota-signing-backup-p521.pub.pem",
 }
-BUILD_TOOLS = Path(os.environ.get("MIKU_BUILD_TOOLS", "/home/reaver/Android/Sdk/build-tools/35.0.0"))
+BUILD_TOOLS = Path(os.environ.get("HIONE_BUILD_TOOLS", "/home/reaver/Android/Sdk/build-tools/35.0.0"))
 AAPT2 = BUILD_TOOLS / "aapt2"
 APKSIGNER = BUILD_TOOLS / "apksigner"
 
 FTVAULT = Path(os.environ.get("FTVAULT", str(Path.home() / ".local/bin/ftvault")))
-VAULT_FOLDER = "ft-mikuos-ota"
+VAULT_FOLDER = "ft-hioneos-ota"
 VAULT_ENTRIES = {
     "primary": "ota-signing-primary-p521.pem",
     "backup": "ota-signing-backup-p521.pem",
 }
 
-PUBLIC_ORIGIN = "https://mikuos.falcontechnix.com"
+PUBLIC_ORIGIN = "https://hioneos.falcontechnix.com"
 PUBLIC_OTA = PUBLIC_ORIGIN + "/ota"
 INSTALLER_URL = PUBLIC_ORIGIN + "/install/"
 
 DEPLOY_HOST = "root@10.10.10.5"                           # rieska, behind Cloudflare
-DEPLOY_PATH = "/var/www/html/falcontechnix/mikuos/ota"    # site root is .../falcontechnix/mikuos/
+DEPLOY_PATH = "/var/www/html/falcontechnix/hioneos/ota"    # site root is .../falcontechnix/hioneos/
 DEPLOY_OWNER = "1000:1000"                                # what the site publish.sh chowns to
 CLOUDFLARE_ENV = Path.home() / ".config/cloudflare/.env"  # CF_API_TOKEN, CF_ZONE_ID_FALCONTECHNIX
 CF_ZONE_VAR = "CF_ZONE_ID_FALCONTECHNIX"
-SITE_PUBLISH = Path.home() / "Documents/GitHub/webdev/mikuos-site/publish.sh"
+SITE_PUBLISH = Path.home() / "Documents/GitHub/webdev/hioneos-site/publish.sh"
 
 CHANNELS = ("stable", "beta", "dev")
 SCHEMA_VERSION = 1
-NEVER_PUBLISH = {"com.caf.fmradio"}  # FM must only come from the image (JNI needs its namespace)
+NEVER_PUBLISH = {"com.caf.fmradio", "com.hione.tv"}  # FM is image-only; TV is for Android TV sets, not the M500 image
 
 
 def updatable(pkg: str) -> bool:
     if pkg in NEVER_PUBLISH:
         return False
-    return pkg.startswith("com.miku.") or pkg == "com.m500.hardware"
+    return pkg.startswith("com.hione.") or pkg == "com.m500.hardware"
 
 
 # ----------------------------------------------------------------------------------------------
@@ -102,9 +102,9 @@ def sha256_file(p: Path) -> str:
 
 
 def default_build() -> str:
-    m = re.search(r'MIKUOS_VERSION="\$\{MIKUOS_VERSION:-([^}"]+)\}"', BUILD_SCRIPT.read_text())
+    m = re.search(r'HIONEOS_VERSION="\$\{HIONEOS_VERSION:-([^}"]+)\}"', BUILD_SCRIPT.read_text())
     if not m:
-        die(f"could not read MIKUOS_VERSION from {BUILD_SCRIPT}; pass --build")
+        die(f"could not read HIONEOS_VERSION from {BUILD_SCRIPT}; pass --build")
     return m.group(1)
 
 
@@ -133,7 +133,7 @@ def signer_digest(apk: Path, fatal: bool = True):
     if r.returncode != 0:
         problem = f"apksigner rejects it: {(r.stderr or r.stdout).strip().splitlines()[0]}"
     elif len(digests) != 1:
-        problem = f"{len(digests)} signers; Miku Update only accepts single-signer APKs"
+        problem = f"{len(digests)} signers; Hione Update only accepts single-signer APKs"
     if problem:
         if fatal:
             die(f"{apk}: {problem}")
@@ -155,7 +155,7 @@ def check_text_style(label: str, text: str):
 
 # ----------------------------------------------------------------------------------------------
 def collect(args) -> list:
-    """Release APKs of MikuOS apps, newest versionCode per package."""
+    """Release APKs of HioneOS apps, newest versionCode per package."""
     candidates = [Path(p) for p in args.apk]
     if not args.no_scan:
         candidates += sorted(MODULES_DIR.glob("*/build/outputs/apk/release/*.apk"))
@@ -171,7 +171,7 @@ def collect(args) -> list:
             print(f"  skip  {pkg:<22} {apk.name}  (image only, never an app update)")
             continue
         if not updatable(pkg):
-            print(f"  skip  {pkg:<22} {apk.name}  (not a MikuOS app)")
+            print(f"  skip  {pkg:<22} {apk.name}  (not a HioneOS app)")
             continue
         if args.only and pkg not in args.only:
             continue
@@ -190,7 +190,7 @@ def collect(args) -> list:
         if missing:
             die(f"--only names packages with no release APK: {', '.join(sorted(missing))}")
     if not best:
-        die("no MikuOS release APKs found. Build them first (./gradlew :<module>:assembleRelease).")
+        die("no HioneOS release APKs found. Build them first (./gradlew :<module>:assembleRelease).")
     return [best[k] for k in sorted(best)]
 
 
@@ -239,7 +239,7 @@ def collect_revocations(args, chan_dir: Path) -> list:
             die(f"--revoke wants PKG=VERSIONCODE[:reason], got {item}")
         pkg, vc, reason = m.group(1), int(m.group(2)), (m.group(3) or "").strip()
         if not updatable(pkg):
-            die(f"--revoke {pkg}: not a package Miku Update manages")
+            die(f"--revoke {pkg}: not a package Hione Update manages")
         rev[(pkg, vc)] = reason
     out = [{"package": p, "versionCode": v, "reason": r} for (p, v), r in sorted(rev.items())]
     for r in out:
@@ -300,12 +300,12 @@ def sign_with_vault(manifest: Path, key: str) -> bytes:
         die(f"{FTVAULT} not found")
     script = (
         'set -euo pipefail; set +x; '
-        'openssl dgst -sha512 -sign <("$MIKU_FTVAULT" get "$MIKU_VAULT_FOLDER" "$MIKU_VAULT_ENTRY") '
-        '-binary "$MIKU_MANIFEST"'
+        'openssl dgst -sha512 -sign <("$HIONE_FTVAULT" get "$HIONE_VAULT_FOLDER" "$HIONE_VAULT_ENTRY") '
+        '-binary "$HIONE_MANIFEST"'
     )
     env = dict(os.environ,
-               MIKU_FTVAULT=str(FTVAULT), MIKU_VAULT_FOLDER=VAULT_FOLDER,
-               MIKU_VAULT_ENTRY=VAULT_ENTRIES[key], MIKU_MANIFEST=str(manifest))
+               HIONE_FTVAULT=str(FTVAULT), HIONE_VAULT_FOLDER=VAULT_FOLDER,
+               HIONE_VAULT_ENTRY=VAULT_ENTRIES[key], HIONE_MANIFEST=str(manifest))
     # stdin/stderr stay on the terminal so a vault or key passphrase prompt still works;
     # stdout is the signature only.
     r = subprocess.run(["bash", "-c", script], env=env, stdout=subprocess.PIPE, check=False)
@@ -368,7 +368,7 @@ def check_site_publish():
     if not re.search(r"--exclude[ =]['\"]?/?ota\b", text):
         die(f"{SITE_PUBLISH} runs rsync --delete over the whole site and would wipe /ota/ next time.\n"
             "  Add  --exclude /ota  to its rsync line first, e.g.\n"
-            "    rsync -az --delete --exclude publish.sh --exclude lost+found --exclude /ota \"$here/\" root@10.10.10.5:/var/www/html/falcontechnix/mikuos/\n"
+            "    rsync -az --delete --exclude publish.sh --exclude lost+found --exclude /ota \"$here/\" root@10.10.10.5:/var/www/html/falcontechnix/hioneos/\n"
             "  (or pass --skip-site-check if you have handled it another way)")
 
 
@@ -450,7 +450,7 @@ def purge_cloudflare(urls: list):
 
 
 def fetch(url: str, headers=None, method="GET"):
-    req = urllib.request.Request(url, headers={"User-Agent": "mikuos-ota-publish", "Cache-Control": "no-cache", **(headers or {})}, method=method)
+    req = urllib.request.Request(url, headers={"User-Agent": "hioneos-ota-publish", "Cache-Control": "no-cache", **(headers or {})}, method=method)
     return urllib.request.urlopen(req, timeout=30)
 
 
@@ -490,8 +490,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--channel", choices=CHANNELS, help="channel to publish (stable, beta, dev)")
     ap.add_argument("--changelog", help="plain text file shown on devices (no emojis, no em dashes)")
-    ap.add_argument("--build", help="MikuOS build these apps belong to (default: MIKUOS_VERSION in build_mikuos_super.sh)")
-    ap.add_argument("--min-build", help="oldest MikuOS build allowed to take these app updates (default: --build)")
+    ap.add_argument("--build", help="HioneOS build these apps belong to (default: HIONEOS_VERSION in build_hioneos_super.sh)")
+    ap.add_argument("--min-build", help="oldest HioneOS build allowed to take these app updates (default: --build)")
     ap.add_argument("--requires-build", action="append", default=[], metavar="PKG=BUILD",
                     help="per-APK minimum build, repeatable")
     ap.add_argument("--system-update-build", help="announce a full image of this build")
@@ -499,7 +499,7 @@ def main():
     ap.add_argument("--system-update-required", action="store_true", help="mark the image as needed, not just available")
     ap.add_argument("--installer-url", default=INSTALLER_URL)
     ap.add_argument("--key", choices=("primary", "backup"), default="primary", help="vault key to sign with")
-    ap.add_argument("--out", default=str(HERE / "out"), help="staging dir, mirrors the server (default mikuos/ota/out)")
+    ap.add_argument("--out", default=str(HERE / "out"), help="staging dir, mirrors the server (default hioneos/ota/out)")
     ap.add_argument("--apk", action="append", default=[], help="extra APK path, repeatable")
     ap.add_argument("--no-scan", action="store_true", help="only use --apk files, do not scan build outputs")
     ap.add_argument("--only", action="append", default=[], metavar="PKG", help="publish only these packages")
@@ -525,7 +525,7 @@ def main():
         ap.error("--dry-run and --upload do not mix")
     for t in (AAPT2, APKSIGNER):
         if not t.exists():
-            die(f"{t} not found (set MIKU_BUILD_TOOLS)")
+            die(f"{t} not found (set HIONE_BUILD_TOOLS)")
     for p in PUBKEYS.values():
         if not p.exists():
             die(f"public key {p} missing")
@@ -543,7 +543,7 @@ def main():
     (out / "ota").mkdir(parents=True, exist_ok=True)
     marker = out / "DRY_RUN"
 
-    print(f"MikuOS OTA publish: channel {args.channel}, build {args.build}, min_build {args.min_build}")
+    print(f"HioneOS OTA publish: channel {args.channel}, build {args.build}, min_build {args.min_build}")
     apks = collect(args)
     signer = stage_apks(apks, out, args.expect_signer)
     print(f"  signer certificate {signer}")

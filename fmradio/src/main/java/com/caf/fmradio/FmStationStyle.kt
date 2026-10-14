@@ -64,11 +64,11 @@ val FmReach.Verdict.outOfReach: Boolean
 
 val FmReach.Verdict.color: Color
     get() = when (this) {
-        FmReach.Verdict.HEARD -> MikuCyan
-        FmReach.Verdict.LIKELY -> MikuTeal
+        FmReach.Verdict.HEARD -> HioneCyan
+        FmReach.Verdict.LIKELY -> HioneTeal
         FmReach.Verdict.MARGINAL -> CyberAmber
-        FmReach.Verdict.UNLIKELY -> MikuPink.copy(alpha = 0.75f)
-        FmReach.Verdict.NOT_HEARD -> MikuNeonPink
+        FmReach.Verdict.UNLIKELY -> HionePink.copy(alpha = 0.75f)
+        FmReach.Verdict.NOT_HEARD -> HioneNeonPink
         FmReach.Verdict.UNKNOWN -> CyberMuted
     }
 
@@ -88,10 +88,10 @@ val FmReach.Verdict.shortLabel: String
  * conventional "as good as free space" limit, and below zero the ground itself is in the line.
  */
 enum class Los(val label: String, val color: Color) {
-    CLEAR("clear", MikuCyan),
-    OK("60% clear", MikuTeal),
+    CLEAR("clear", HioneCyan),
+    OK("60% clear", HioneTeal),
     GRAZING("grazing", CyberAmber),
-    BLOCKED("blocked", MikuNeonPink),
+    BLOCKED("blocked", HioneNeonPink),
     UNKNOWN("terrain ?", CyberMuted);
 
     companion object {
@@ -113,11 +113,11 @@ fun genreColor(genre: String?): Color {
         "country" in g -> Color(0xFFFFC857)
         "public" in g || "npr" in g -> Color(0xFF7FB4FF)
         "christian" in g || "relig" in g || "gospel" in g -> Color(0xFFB9A3FF)
-        "top 40" in g || "pop" in g || "chr" in g || "hits" in g -> MikuPink
+        "top 40" in g || "pop" in g || "chr" in g || "hits" in g -> HionePink
         "news" in g || "talk" in g || "sport" in g -> Color(0xFFB0BEC5)
         "jazz" in g || "classical" in g -> Color(0xFF9FE6A0)
         "hip" in g || "urban" in g || "r&b" in g || "rhythm" in g -> Color(0xFFFF9BE0)
-        "college" in g || "variety" in g || "free" in g -> MikuTealBright
+        "college" in g || "variety" in g || "free" in g -> HioneTealBright
         "oldies" in g || "classic" in g -> Color(0xFFFFA26B)
         "spanish" in g || "latin" in g -> Color(0xFFFF6E6E)
         else -> stationColor("G$g")
@@ -192,8 +192,8 @@ fun ReceptionGauge(
         if (los == Los.BLOCKED) {
             val cx = gx + gw * 0.5f
             val r = gh * 0.28f
-            drawLine(MikuNeonPink, Offset(cx - r, lineY - r), Offset(cx + r, lineY + r), strokeWidth = 1.2f * density)
-            drawLine(MikuNeonPink, Offset(cx - r, lineY + r), Offset(cx + r, lineY - r), strokeWidth = 1.2f * density)
+            drawLine(HioneNeonPink, Offset(cx - r, lineY - r), Offset(cx + r, lineY + r), strokeWidth = 1.2f * density)
+            drawLine(HioneNeonPink, Offset(cx - r, lineY + r), Offset(cx + r, lineY - r), strokeWidth = 1.2f * density)
         }
     }
 }

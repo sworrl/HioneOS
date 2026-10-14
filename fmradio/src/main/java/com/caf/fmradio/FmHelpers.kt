@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Minimal helpers so the FM app (com.caf.fmradio) is self-contained — it can't depend on the
- * com.miku.player app module, so the few utilities it used are reproduced here.
+ * com.hione.player app module, so the few utilities it used are reproduced here.
  *
  * There used to be a RootShell here. Nothing called it, and nothing should: everything this app
  * needs from the platform it gets from being platform-signed, and shelling out would only have
@@ -42,15 +42,15 @@ object CrashSentinel {
 }
 
 @Composable
-fun MikuBackButton(onClick: () -> Unit) {
+fun HioneBackButton(onClick: () -> Unit) {
     Box(
         Modifier.size(40.dp)
             .clip(CircleShape)
-            .background(Color(0x2200E5FF))
-            .border(1.dp, MikuCyan, CircleShape)
+            .background(Color(0x22FFC56B))
+            .border(1.dp, HioneCyan, CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Back", tint = MikuCyan, modifier = Modifier.size(26.dp))
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Back", tint = HioneCyan, modifier = Modifier.size(26.dp))
     }
 }

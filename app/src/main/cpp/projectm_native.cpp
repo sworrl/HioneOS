@@ -31,7 +31,7 @@ static int                      s_pendingResult = 0;
 extern "C" {
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeInit(JNIEnv* /*env*/, jobject /*thiz*/) {
+Java_com_hione_player_ProjectMNative_nativeInit(JNIEnv* /*env*/, jobject /*thiz*/) {
     std::lock_guard<std::mutex> g(s_lock);
     // A new GL surface (e.g. entering fullscreen) has a fresh GL context; projectM's
     // GL objects are context-bound, so tear down any old instance and rebuild here.
@@ -77,7 +77,7 @@ Java_com_miku_player_ProjectMNative_nativeInit(JNIEnv* /*env*/, jobject /*thiz*/
     // straight into a preset.
     // A preset that fails to parse or compile used to vanish silently: the playlist retried past
     // it and nobody learned which one was broken. Log every failure by name. This is how the 80
-    // Miku presets get verified rather than assumed.
+    // Hione presets get verified rather than assumed.
     projectm_set_preset_switch_failed_event_callback(s_pm, [](const char* file, const char* msg, void*) {
         LOGE("PRESET FAILED: %s :: %s", file ? file : "?", msg ? msg : "?");
         s_presetFailures++;
@@ -95,14 +95,14 @@ Java_com_miku_player_ProjectMNative_nativeInit(JNIEnv* /*env*/, jobject /*thiz*/
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeResize(JNIEnv* /*env*/, jobject /*thiz*/, jint w, jint h) {
+Java_com_hione_player_ProjectMNative_nativeResize(JNIEnv* /*env*/, jobject /*thiz*/, jint w, jint h) {
     std::lock_guard<std::mutex> g(s_lock);
     if (s_pm && w > 0 && h > 0)
         projectm_set_window_size(s_pm, (size_t) w, (size_t) h);
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeFeedAudio(JNIEnv* env, jobject /*thiz*/,
+Java_com_hione_player_ProjectMNative_nativeFeedAudio(JNIEnv* env, jobject /*thiz*/,
                                                     jfloatArray /*fft*/, jfloatArray pcm) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_pm || pcm == nullptr) return;
@@ -116,7 +116,7 @@ Java_com_miku_player_ProjectMNative_nativeFeedAudio(JNIEnv* env, jobject /*thiz*
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeRender(JNIEnv* /*env*/, jobject /*thiz*/,
+Java_com_hione_player_ProjectMNative_nativeRender(JNIEnv* /*env*/, jobject /*thiz*/,
                                                  jfloat /*t*/, jint /*preset*/,
                                                  jfloat /*bass*/, jfloat /*treble*/) {
     std::lock_guard<std::mutex> g(s_lock);
@@ -138,7 +138,7 @@ Java_com_miku_player_ProjectMNative_nativeRender(JNIEnv* /*env*/, jobject /*thiz
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeSetPreset(JNIEnv* /*env*/, jobject /*thiz*/, jint /*preset*/) {
+Java_com_hione_player_ProjectMNative_nativeSetPreset(JNIEnv* /*env*/, jobject /*thiz*/, jint /*preset*/) {
     // No-op by design: preset changes come from the playlist auto-cycle + gestures (next/prev).
     // Advancing here made mounting a surface (e.g. entering fullscreen) jump to a new preset.
 }
@@ -154,21 +154,21 @@ static std::string basename_noext(const char* p) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeNext(JNIEnv*, jobject) {
+Java_com_hione_player_ProjectMNative_nativeNext(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_playlist) return;
     try { projectm_playlist_play_next(s_playlist, true); } catch (...) { LOGE("next threw"); }
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativePrev(JNIEnv*, jobject) {
+Java_com_hione_player_ProjectMNative_nativePrev(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_playlist) return;
     try { projectm_playlist_play_previous(s_playlist, true); } catch (...) { LOGE("prev threw"); }
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_ProjectMNative_nativeToggleLock(JNIEnv*, jobject) {
+Java_com_hione_player_ProjectMNative_nativeToggleLock(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_pm) return JNI_FALSE;
     try {
@@ -179,13 +179,13 @@ Java_com_miku_player_ProjectMNative_nativeToggleLock(JNIEnv*, jobject) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_ProjectMNative_nativeIsLocked(JNIEnv*, jobject) {
+Java_com_hione_player_ProjectMNative_nativeIsLocked(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     return (s_pm && projectm_get_preset_locked(s_pm)) ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_miku_player_ProjectMNative_nativePresetName(JNIEnv* env, jobject) {
+Java_com_hione_player_ProjectMNative_nativePresetName(JNIEnv* env, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_playlist) return env->NewStringUTF("");
     try {
@@ -204,7 +204,7 @@ Java_com_miku_player_ProjectMNative_nativePresetName(JNIEnv* env, jobject) {
  * header says to hand the pointer back to projectm_free_string().
  */
 JNIEXPORT jstring JNICALL
-Java_com_miku_player_ProjectMNative_nativeVersion(JNIEnv* env, jobject) {
+Java_com_hione_player_ProjectMNative_nativeVersion(JNIEnv* env, jobject) {
     try {
         char* v = projectm_get_version_string();
         std::string out = v ? v : "";
@@ -215,7 +215,7 @@ Java_com_miku_player_ProjectMNative_nativeVersion(JNIEnv* env, jobject) {
 
 /** Git revision the vendored library was built from. Shown next to the version in the debug row. */
 JNIEXPORT jint JNICALL
-Java_com_miku_player_ProjectMNative_nativePresetFailures(JNIEnv*, jobject) { return s_presetFailures; }
+Java_com_hione_player_ProjectMNative_nativePresetFailures(JNIEnv*, jobject) { return s_presetFailures; }
 
 /**
  * Self-test hand-off. Preset loading compiles shaders and MUST happen on the GL thread, so this
@@ -224,7 +224,7 @@ Java_com_miku_player_ProjectMNative_nativePresetFailures(JNIEnv*, jobject) { ret
  */
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeQueueLoadPresetPath(JNIEnv* env, jobject, jstring jpath) {
+Java_com_hione_player_ProjectMNative_nativeQueueLoadPresetPath(JNIEnv* env, jobject, jstring jpath) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!jpath) return;
     const char* p = env->GetStringUTFChars(jpath, nullptr);
@@ -234,13 +234,13 @@ Java_com_miku_player_ProjectMNative_nativeQueueLoadPresetPath(JNIEnv* env, jobje
 }
 
 JNIEXPORT jint JNICALL
-Java_com_miku_player_ProjectMNative_nativePendingLoadResult(JNIEnv*, jobject) {
+Java_com_hione_player_ProjectMNative_nativePendingLoadResult(JNIEnv*, jobject) {
     std::lock_guard<std::mutex> g(s_lock);
     return s_pendingResult;
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_miku_player_ProjectMNative_nativeVcsVersion(JNIEnv* env, jobject) {
+Java_com_hione_player_ProjectMNative_nativeVcsVersion(JNIEnv* env, jobject) {
     try {
         char* v = projectm_get_vcs_version_string();
         std::string out = v ? v : "";
@@ -250,14 +250,14 @@ Java_com_miku_player_ProjectMNative_nativeVcsVersion(JNIEnv* env, jobject) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeSetBeatSensitivity(JNIEnv*, jobject, jfloat s) {
+Java_com_hione_player_ProjectMNative_nativeSetBeatSensitivity(JNIEnv*, jobject, jfloat s) {
     std::lock_guard<std::mutex> g(s_lock);
     if (s_pm) projectm_set_beat_sensitivity(s_pm, s);
 }
 
 // Load a directory of .milk presets into the playlist (called with the extracted assets path).
 JNIEXPORT void JNICALL
-Java_com_miku_player_ProjectMNative_nativeLoadPresets(JNIEnv* env, jobject /*thiz*/, jstring dir) {
+Java_com_hione_player_ProjectMNative_nativeLoadPresets(JNIEnv* env, jobject /*thiz*/, jstring dir) {
     std::lock_guard<std::mutex> g(s_lock);
     if (!s_playlist || dir == nullptr) return;
     const char* path = env->GetStringUTFChars(dir, nullptr);

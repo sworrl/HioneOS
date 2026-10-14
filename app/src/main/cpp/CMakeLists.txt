@@ -47,3 +47,6 @@ target_link_libraries(
         ${egl-lib}
         ${android-lib}
 )
+
+# Tempo and beat tracking (QM-DSP TempoTrackV2 + BTrack), its own libhionebeat.so.
+add_subdirectory(hionebeat ${CMAKE_BINARY_DIR}/hionebeat_build)

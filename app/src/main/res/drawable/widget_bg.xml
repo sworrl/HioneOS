@@ -5,6 +5,6 @@
         android:angle="0"
         android:startColor="#F20C2B2E"
         android:centerColor="#F20E2A28"
-        android:endColor="#F204161A" />
-    <stroke android:width="1dp" android:color="#4D39C5BB" />
+        android:endColor="#F2121318" />
+    <stroke android:width="1dp" android:color="#4DFFAB2E" />
 </shape>

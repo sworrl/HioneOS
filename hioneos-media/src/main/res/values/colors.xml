@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hione_bg">#FF0D0E11</color>
+    <color name="hione_teal">#FFFFAB2E</color>
+    <color name="hione_pink">#FF8EC5FF</color>
+    <color name="icon_bg_top">#FF0D2529</color>
+    <color name="icon_bg_bottom">#FF050A0C</color>
+</resources>

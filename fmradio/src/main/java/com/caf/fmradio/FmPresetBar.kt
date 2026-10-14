@@ -77,7 +77,7 @@ fun FmPresetBar(
             Text(
                 if (!hasPosition) "No presets yet. Tap the star to save a station. Local stations show up once the device knows where it is."
                 else "No presets yet. Tap the star on the dial to save the current station.",
-                color = MikuTextSecondary, fontSize = 8.sp, lineHeight = 11.sp,
+                color = HioneTextSecondary, fontSize = 8.sp, lineHeight = 11.sp,
                 modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 3
             )
             AllStationsChip(onAllStations)
@@ -137,7 +137,7 @@ private fun PresetChip(t: PresetTarget, selected: Boolean, onDetails: (PresetTar
             .glass(
                 shape,
                 accent = color,
-                accent2 = if (selected) Color.White else MikuPink,
+                accent2 = if (selected) Color.White else HionePink,
                 fill = if (selected) color.copy(alpha = 0.22f).compositeOverDark() else Color(0xC00A1E26),
                 rimAlpha = if (selected) 1f else 0.5f,
                 rimWidth = if (selected) 1.6.dp else 1.dp,
@@ -161,19 +161,19 @@ private fun PresetChip(t: PresetTarget, selected: Boolean, onDetails: (PresetTar
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        stn?.call?.substringBefore("-FM") ?: fmtMhz(t.khz),
+                        stn?.chipLabel ?: fmtMhz(t.khz),
                         color = if (selected) Color.White else color,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                         maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.weight(1f, fill = false)
                     )
                     if (t.isPreset) {
                         Spacer(Modifier.width(2.dp))
-                        Icon(Icons.Default.Star, "Preset", tint = MikuNeonPink, modifier = Modifier.size(10.dp))
+                        Icon(Icons.Default.Star, "Preset", tint = HioneNeonPink, modifier = Modifier.size(10.dp))
                     }
                 }
                 Text(
                     if (stn != null) "${fmtMhz(t.khz)} · ${stn.distanceKm.toInt()} km" else "MHz · preset",
-                    color = MikuTextPrimary.copy(alpha = 0.85f), fontSize = 8.5.sp, maxLines = 1,
+                    color = HioneTextPrimary.copy(alpha = 0.85f), fontSize = 8.5.sp, maxLines = 1,
                 )
                 val sub = stn?.genre ?: stn?.reach?.takeIf { it != FmReach.Verdict.UNKNOWN }?.shortLabel ?: stn?.kind
                 if (sub != null) {
@@ -201,9 +201,9 @@ private fun TierMarker() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(Icons.Default.NearMe, null, tint = MikuTeal.copy(alpha = 0.8f), modifier = Modifier.size(14.dp))
+        Icon(Icons.Default.NearMe, null, tint = HioneTeal.copy(alpha = 0.8f), modifier = Modifier.size(14.dp))
         Spacer(Modifier.height(2.dp))
-        Text("NEAR", color = MikuTeal.copy(alpha = 0.8f), fontSize = 6.sp, fontFamily = AudiowideFont)
+        Text("NEAR", color = HioneTeal.copy(alpha = 0.8f), fontSize = 6.sp, fontFamily = AudiowideFont)
     }
 }
 
@@ -211,14 +211,14 @@ private fun TierMarker() {
 private fun AllStationsChip(onClick: () -> Unit) {
     Column(
         Modifier.width(64.dp).height(56.dp)
-            .glass(RoundedCornerShape(14.dp), accent = MikuTeal, rimAlpha = 0.45f, shine = 0.8f)
+            .glass(RoundedCornerShape(14.dp), accent = HioneTeal, rimAlpha = 0.45f, shine = 0.8f)
             .pressable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(Icons.Default.Search, "All stations", tint = MikuTeal, modifier = Modifier.size(18.dp))
+        Icon(Icons.Default.Search, "All stations", tint = HioneTeal, modifier = Modifier.size(18.dp))
         Spacer(Modifier.height(2.dp))
-        Text("ALL", color = MikuTeal, fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont)
+        Text("ALL", color = HioneTeal, fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont)
     }
 }
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Combined live BPM + tapper: defaults to a 2x1 card, still squeezable to badge size. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="80dp"
+    android:minResizeWidth="40dp"
+    android:minResizeHeight="40dp"
+    android:maxResizeWidth="300dp"
+    android:maxResizeHeight="200dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen|keyguard"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_hione_bpm_combo"
+    android:previewLayout="@layout/widget_hione_bpm_combo"
+    android:description="@string/widget_desc_bpm_combo" />

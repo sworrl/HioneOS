@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MikuPlayer" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#04161A</item>
-        <item name="android:navigationBarColor">#04161A</item>
-        <item name="android:windowBackground">#04161A</item>
-        <item name="android:windowSplashScreenBackground">#04161A</item>
+    <style name="Theme.HionePlayer" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#121318</item>
+        <item name="android:navigationBarColor">#121318</item>
+        <item name="android:windowBackground">#121318</item>
+        <item name="android:windowSplashScreenBackground">#121318</item>
         <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
     </style>
 </resources>

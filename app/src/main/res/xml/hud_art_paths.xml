@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Now-playing HUD art handed to MikuOS SystemUI (MikuTrackHud): 256px JPEGs in cache/hud. -->
+<!-- Now-playing HUD art handed to HioneOS SystemUI (HioneTrackHud): 256px JPEGs in cache/hud. -->
 <paths>
     <cache-path name="hud" path="hud/" />
 </paths>

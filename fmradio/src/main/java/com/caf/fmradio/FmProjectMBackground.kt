@@ -35,9 +35,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-/** What sits behind the tuner UI. Persisted in the FM prefs ("miku_fm"). */
+/** What sits behind the tuner UI. Persisted in the FM prefs ("hione_fm"). */
 enum class FmBackgroundMode(val label: String) {
-    MIKU_ART("Miku art"),
+    HIONE_ART("Hione art"),
     PROJECTM("projectM visualizer"),
 }
 
@@ -48,7 +48,7 @@ object FmBackgroundPrefs {
     /** Default is the visualizer. Read once, then kept in memory. */
     fun mode(ctx: Context): StateFlow<FmBackgroundMode> {
         if (_mode.value == null) {
-            val saved = ctx.getSharedPreferences("miku_fm", Context.MODE_PRIVATE).getString(KEY, null)
+            val saved = ctx.getSharedPreferences("hione_fm", Context.MODE_PRIVATE).getString(KEY, null)
             _mode.value = FmBackgroundMode.entries.firstOrNull { it.name == saved } ?: FmBackgroundMode.PROJECTM
         }
         @Suppress("UNCHECKED_CAST")
@@ -57,19 +57,19 @@ object FmBackgroundPrefs {
 
     fun set(ctx: Context, m: FmBackgroundMode) {
         _mode.value = m
-        ctx.getSharedPreferences("miku_fm", Context.MODE_PRIVATE).edit().putString(KEY, m.name).apply()
+        ctx.getSharedPreferences("hione_fm", Context.MODE_PRIVATE).edit().putString(KEY, m.name).apply()
     }
 }
 
 /**
- * The FM screen's background: projectM (as in Miku Music's cassette mode) or the Miku art.
+ * The FM screen's background: projectM (as in Hione Music's cassette mode) or the Hione art.
  *
  * Put it where the art is drawn now, as the first child of the screen's root Box, and pass the
  * existing art as [fallback]:
  *
  *     FmVisualizerBackground(fallback = { FmBackdrop() })
  *
- * [fallback] is drawn when the setting says Miku art, and also when libfmprojectm did not load,
+ * [fallback] is drawn when the setting says Hione art, and also when libfmprojectm did not load,
  * so the screen is never left with a blank background.
  *
  * The visualizer is a GLSurfaceView below the window; Compose content drawn after this composable
@@ -127,7 +127,7 @@ fun FmBackgroundSetting() {
     val ctx = LocalContext.current
     val mode by remember { FmBackgroundPrefs.mode(ctx.applicationContext) }.collectAsState()
     Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-        Text("BACKGROUND", color = MikuTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+        Text("BACKGROUND", color = HioneTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
         Spacer(Modifier.height(4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             FmBackgroundMode.entries.forEach { m ->
@@ -135,15 +135,15 @@ fun FmBackgroundSetting() {
                 val enabled = m != FmBackgroundMode.PROJECTM || FmProjectMNative.available
                 Box(
                     Modifier.weight(1f).clip(RoundedCornerShape(8.dp))
-                        .background(if (sel) MikuCyan else Color(0x2200E5FF))
-                        .border(1.dp, if (sel) MikuCyan else CyberGlassBorder, RoundedCornerShape(8.dp))
+                        .background(if (sel) HioneCyan else Color(0x22FFC56B))
+                        .border(1.dp, if (sel) HioneCyan else CyberGlassBorder, RoundedCornerShape(8.dp))
                         .clickable(enabled = enabled) { FmBackgroundPrefs.set(ctx.applicationContext, m) }
                         .padding(vertical = 6.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         m.label,
-                        color = when { sel -> Color.Black; enabled -> MikuTextSecondary; else -> CyberMuted },
+                        color = when { sel -> Color.Black; enabled -> HioneTextSecondary; else -> CyberMuted },
                         fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                     )
                 }
@@ -156,7 +156,7 @@ fun FmBackgroundSetting() {
                     "listening to. With the tuner off or muted it drifts slowly on its own. It " +
                     "lowers its own resolution if the screen starts to struggle."
             else "The visualizer library is not available in this build, so the art is used.",
-            color = MikuTextSecondary.copy(alpha = 0.8f), fontSize = 7.5.sp, lineHeight = 10.sp,
+            color = HioneTextSecondary.copy(alpha = 0.8f), fontSize = 7.5.sp, lineHeight = 10.sp,
         )
     }
 }

@@ -25,11 +25,11 @@ import java.lang.reflect.Proxy
  * TWO ROUTES IN. In front, the activity hands keys here from dispatchKeyEvent. Behind other
  * apps or with the screen off, keys go to whichever media session Android picks, and it picks
  * by the app that last played audio through an AudioTrack. The radio plays through the HAL's
- * hardware loopback, not an AudioTrack, so Android never picks it and Miku Music (or its media
+ * hardware loopback, not an AudioTrack, so Android never picks it and Hione Music (or its media
  * button receiver) gets the keys. So while the tuner is on this registers the system's media
  * key listener (SET_MEDIA_KEY_LISTENER, signature, held by this platform-signed app), which sees
  * every media key before any session does. It is removed the moment the tuner powers off, so
- * the keys go back to Miku Music.
+ * the keys go back to Hione Music.
  *
  * Long presses are timed from key down to key up, not from key repeats: with the screen off,
  * the window manager hands media keys straight to the session service and no repeats are made.
@@ -131,16 +131,16 @@ object FmMediaKeys {
             if (st.isMuted) FmRadioManager.toggleMute()
             return
         }
-        MikuFmService.start(ctx.applicationContext)
+        HioneFmService.start(ctx.applicationContext)
     }
 
     fun powerOff(ctx: Context) {
-        if (FmRadioManager.state.value.isPowerOn) MikuFmService.stop(ctx.applicationContext)
+        if (FmRadioManager.state.value.isPowerOn) HioneFmService.stop(ctx.applicationContext)
     }
 
     /**
-     * Mute and unmute while on, so the key keeps the radio, not Miku Music: powering off here
-     * would hand the next press to Miku Music. Held, the same key powers off.
+     * Mute and unmute while on, so the key keeps the radio, not Hione Music: powering off here
+     * would hand the next press to Hione Music. Held, the same key powers off.
      */
     private fun playPause(ctx: Context) {
         val st = FmRadioManager.state.value

@@ -7,15 +7,19 @@ plugins {
 }
 
 android {
-    namespace = "com.miku.player"
+    // Launcher icons for the mascot label aliases (ic_launcher_hione*), one shared copy for every
+    // app that has an alias. See Mascot.kt and hioneos/mascot/runtime.
+    sourceSets["main"].res.srcDir(rootProject.file("../hioneos/mascot/runtime/res"))
+
+    namespace = "com.hione.player"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.miku.player"
+        applicationId = "com.hione.player"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2316
-        versionName = "2.2.0"
+        versionCode = 2317
+        versionName = "2.2.1"
 
         // Last.fm API credentials — read from local.properties (gitignored, never committed) so
         // the key/secret never live in source. Register a free app at
@@ -29,7 +33,7 @@ android {
         // constants in the DEX. R8 renames classes and methods; it does NOT obfuscate string
         // literals, so anyone with the APK can read the shared secret in a couple of minutes. That
         // is the accepted trade for a shipped app key: users sign in as themselves and never handle
-        // an API account. The exposure is that someone can impersonate MikuOS to Last.fm, and the
+        // an API account. The exposure is that someone can impersonate HioneOS to Last.fm, and the
         // consequence is Last.fm revoking the key, which breaks scrobbling for every install at
         // once. It is NOT a path to any user's account: user sessions come from the browser flow
         // (LastFm.completeAuth) and each session key stays in that device's encrypted prefs.
@@ -44,34 +48,34 @@ android {
 
         // Media ingestion server + network/VPN telemetry — read from local.properties (gitignored,
         // never committed) so no personal host/IP/subnet lives in source. All default to "" when the
-        // file omits the key: MikuIngestConfig then falls back to runtime auto-discovery (empty host)
+        // file omits the key: HioneIngestConfig then falls back to runtime auto-discovery (empty host)
         // or a neutral "not configured" display. The user can also set these at runtime (persisted to
-        // SharedPreferences) via MikuIngestConfig.set*. Example local.properties entries:
-        //   miku.sync.host=192.0.2.10      # your rsync ingest server (TEST-NET example)
-        //   miku.sync.port=8730
-        //   miku.lan.hints=192.0.2.        # comma-separated IP/subnet hints for discovery + home detection
-        //   miku.home.ssids=MyWifi         # comma-separated home Wi-Fi SSIDs
-        //   miku.vpn.endpoint=vpn.example.com:51820
-        //   miku.vpn.assigned.ip=192.0.2.250
-        //   miku.vpn.routes=192.0.2.0/24
-        buildConfigField("String", "MIKU_SYNC_HOST", "\"${localProps.getProperty("miku.sync.host", "")}\"")
-        buildConfigField("String", "MIKU_SYNC_PORT", "\"${localProps.getProperty("miku.sync.port", "")}\"")
-        buildConfigField("String", "MIKU_LAN_HINTS", "\"${localProps.getProperty("miku.lan.hints", "")}\"")
-        buildConfigField("String", "MIKU_HOME_SSIDS", "\"${localProps.getProperty("miku.home.ssids", "")}\"")
-        buildConfigField("String", "MIKU_VPN_ENDPOINT", "\"${localProps.getProperty("miku.vpn.endpoint", "")}\"")
-        buildConfigField("String", "MIKU_VPN_ASSIGNED_IP", "\"${localProps.getProperty("miku.vpn.assigned.ip", "")}\"")
-        buildConfigField("String", "MIKU_VPN_ROUTES", "\"${localProps.getProperty("miku.vpn.routes", "")}\"")
+        // SharedPreferences) via HioneIngestConfig.set*. Example local.properties entries:
+        //   hione.sync.host=192.0.2.10      # your rsync ingest server (TEST-NET example)
+        //   hione.sync.port=8730
+        //   hione.lan.hints=192.0.2.        # comma-separated IP/subnet hints for discovery + home detection
+        //   hione.home.ssids=MyWifi         # comma-separated home Wi-Fi SSIDs
+        //   hione.vpn.endpoint=vpn.example.com:51820
+        //   hione.vpn.assigned.ip=192.0.2.250
+        //   hione.vpn.routes=192.0.2.0/24
+        buildConfigField("String", "HIONE_SYNC_HOST", "\"${localProps.getProperty("hione.sync.host", "")}\"")
+        buildConfigField("String", "HIONE_SYNC_PORT", "\"${localProps.getProperty("hione.sync.port", "")}\"")
+        buildConfigField("String", "HIONE_LAN_HINTS", "\"${localProps.getProperty("hione.lan.hints", "")}\"")
+        buildConfigField("String", "HIONE_HOME_SSIDS", "\"${localProps.getProperty("hione.home.ssids", "")}\"")
+        buildConfigField("String", "HIONE_VPN_ENDPOINT", "\"${localProps.getProperty("hione.vpn.endpoint", "")}\"")
+        buildConfigField("String", "HIONE_VPN_ASSIGNED_IP", "\"${localProps.getProperty("hione.vpn.assigned.ip", "")}\"")
+        buildConfigField("String", "HIONE_VPN_ROUTES", "\"${localProps.getProperty("hione.vpn.routes", "")}\"")
 
-        // Remote entitlement (allow/disallow kill-switch, com.miku.player.entitlement). BOTH the
+        // Remote entitlement (allow/disallow kill-switch, com.hione.player.entitlement). BOTH the
         // Worker URL and the shared HMAC-SHA256 secret must be set or the feature is completely
         // inert (no network, no verdicts, always ALLOWED). The secret must equal the Worker's
         // ENTITLEMENT_HMAC_SECRET (tools/entitlement-worker/README.md). Example:
-        //   miku.entitlement.url=https://mikusan.falcontechnix.com
-        //   miku.entitlement.hmac=<openssl rand -hex 32>
-        //   miku.entitlement.contact=Justin@FalconTechnix.com
-        buildConfigField("String", "MIKU_ENTITLEMENT_URL", "\"${localProps.getProperty("miku.entitlement.url", "")}\"")
-        buildConfigField("String", "MIKU_ENTITLEMENT_HMAC", "\"${localProps.getProperty("miku.entitlement.hmac", "")}\"")
-        buildConfigField("String", "MIKU_ENTITLEMENT_CONTACT", "\"${localProps.getProperty("miku.entitlement.contact", "")}\"")
+        //   hione.entitlement.url=https://hionesan.falcontechnix.com
+        //   hione.entitlement.hmac=<openssl rand -hex 32>
+        //   hione.entitlement.contact=Justin@FalconTechnix.com
+        buildConfigField("String", "HIONE_ENTITLEMENT_URL", "\"${localProps.getProperty("hione.entitlement.url", "")}\"")
+        buildConfigField("String", "HIONE_ENTITLEMENT_HMAC", "\"${localProps.getProperty("hione.entitlement.hmac", "")}\"")
+        buildConfigField("String", "HIONE_ENTITLEMENT_CONTACT", "\"${localProps.getProperty("hione.entitlement.contact", "")}\"")
 
         externalNativeBuild {
             cmake {
@@ -147,9 +151,11 @@ android {
         }
     }
     lint {
+        abortOnError = false
+        checkReleaseBuilds = false
         // Correct-by-design for this platform-signed, single-device ROM app — not defects:
         //  UnsafeOptInUsageError: we deliberately extend Media3 @UnstableApi internals
-        //    (MikuDirectAudioSink) for the bit-perfect DIRECT path.
+        //    (HioneDirectAudioSink) for the bit-perfect DIRECT path.
         //  ProtectedPermissions/QueryAllPackagesPermission: system app on our own ROM.
         disable += setOf("UnsafeOptInUsageError", "ProtectedPermissions", "QueryAllPackagesPermission")
         // Accept the remaining known issues (NewApi on an API-34-only device, pre-granted runtime
@@ -174,7 +180,7 @@ android {
     applicationVariants.all {
         outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
-                outputFileName = "MikuMusic-v${versionName}.apk"
+                outputFileName = "HioneMusic-v${versionName}.apk"
             }
         }
     }

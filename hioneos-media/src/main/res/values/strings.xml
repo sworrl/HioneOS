@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hione Media</string>
+    <string name="gallery_label">Gallery</string>
+    <string name="camera_label">Camera</string>
+    <string name="recorder_label">Recorder</string>
+    <string name="wallpaper_label">Wallpaper</string>
+    <string name="crop_label">Crop picture</string>
+    <string name="edit_label">Edit</string>
+    <string name="rec_channel">Recording</string>
+    <string name="rec_channel_desc">Shows while the recorder is using the microphone</string>
+</resources>

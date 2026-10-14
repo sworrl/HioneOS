@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Miku Tools</string>
-    <string name="clock_label">Clock</string>
-    <string name="calc_label">Calculator</string>
-    <string name="calendar_label">Calendar</string>
-    <string name="ics_import_label">Add to calendar</string>
-</resources>

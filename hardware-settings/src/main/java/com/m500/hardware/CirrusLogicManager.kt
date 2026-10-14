@@ -11,9 +11,9 @@ import java.io.File
  * Controls for the HiBy M500's dual CS43198 DAC.
  *
  * Filter, gain, DRE and high power are the only sa_sound_setting nodes that change hardware on
- * this firmware. They go through [DacBridge] (com.miku.sysbridge). The other controls here
+ * this firmware. They go through [DacBridge] (com.hione.sysbridge). The other controls here
  * (output mode, balance, turbo, DSD compensation) are not real knobs on the M500: the driver
- * stubs them out (mikuos/docs/hiby-audio-knobs.md, section 3.2). Their writes are left as they
+ * stubs them out (hioneos/docs/hiby-audio-knobs.md, section 3.2). Their writes are left as they
  * were and do nothing.
  */
 object CirrusLogicManager {
@@ -98,16 +98,16 @@ object CirrusLogicManager {
     }
 
     // ---- The four knobs that move hardware: filter, gain, DRE, high power ----
-    // Writes go through com.miku.sysbridge (DacBridge). Reads come from
-    // persist.vendor.audio.miku.*, the same values Miku Music and the SystemUI tiles show. The
+    // Writes go through com.hione.sysbridge (DacBridge). Reads come from
+    // persist.vendor.audio.hione.*, the same values Hione Music and the SystemUI tiles show. The
     // Settings.Global rows are still written so older readers agree, and are the fallback when
     // the bridge has never set a knob.
 
-    // Explicit user choices. Miku Music's ensureBestAudio re-applies these on every player start
-    // and pushes its defaults for any knob without a row. Same keys as com.miku.player.MikuDirectAudio.
-    private const val KEY_USER_GAIN = "miku_audio_user_gain"
-    private const val KEY_USER_DRE = "miku_audio_user_dre"
-    private const val KEY_USER_HIGH_POWER = "miku_audio_user_high_power"
+    // Explicit user choices. Hione Music's ensureBestAudio re-applies these on every player start
+    // and pushes its defaults for any knob without a row. Same keys as com.hione.player.HioneDirectAudio.
+    private const val KEY_USER_GAIN = "hione_audio_user_gain"
+    private const val KEY_USER_DRE = "hione_audio_user_dre"
+    private const val KEY_USER_HIGH_POWER = "hione_audio_user_high_power"
 
     private fun globalString(ctx: Context, vararg keys: String): String? {
         val cr = ctx.contentResolver
@@ -141,7 +141,7 @@ object CirrusLogicManager {
         return GainMode.values().firstOrNull { it.id == raw.lowercase() }
     }
 
-    /** Gain only. High power is its own switch, as in Miku Music. */
+    /** Gain only. High power is its own switch, as in Hione Music. */
     suspend fun setGainMode(ctx: Context, gain: GainMode): DacBridge.Result = withContext(Dispatchers.IO) {
         val cr = ctx.contentResolver
         runCatching { Settings.Global.putString(cr, KEY_USER_GAIN, gain.id) }

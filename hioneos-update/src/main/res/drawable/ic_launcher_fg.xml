@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A teal ring with a pink downward arrow: "an update is coming in". -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M54,30a24,24 0,1 1,-0.01 0z"
+        android:strokeColor="#FFFFAB2E" android:strokeWidth="4" android:fillColor="#00000000" />
+    <path android:pathData="M54,40L54,64" android:strokeColor="#FF8EC5FF"
+        android:strokeWidth="5" android:strokeLineCap="round" />
+    <path android:pathData="M43,55L54,66L65,55" android:strokeColor="#FF8EC5FF"
+        android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+</vector>

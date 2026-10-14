@@ -6,7 +6,7 @@ import org.json.JSONObject
 import java.io.File
 
 /**
- * Per-preset performance ledger for the projectM background, ported from Miku Music's PresetPerf
+ * Per-preset performance ledger for the projectM background, ported from Hione Music's PresetPerf
  * (ProjectMVisualizer.kt) with the same bars, plus one thing the player does not need: the
  * render scale steps down BEFORE any preset is blamed.
  *
@@ -64,7 +64,7 @@ internal object FmProjectMPerf {
     /** Presets in the playlist, so the cull floor is half the LIBRARY, not half of the ledger. */
     @Volatile var librarySize = 0
 
-    private fun prefs(ctx: Context) = ctx.getSharedPreferences("miku_fm", Context.MODE_PRIVATE)
+    private fun prefs(ctx: Context) = ctx.getSharedPreferences("hione_fm", Context.MODE_PRIVATE)
 
     /** The scale step this device settled on last time. */
     fun startScale(ctx: Context): Int =

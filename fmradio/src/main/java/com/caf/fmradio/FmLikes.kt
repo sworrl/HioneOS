@@ -12,22 +12,22 @@ import java.io.File
  *
  * A song identified on FM is usually one that is not in the library yet, so a like here is
  * really "I want this": it is kept with where and when it was heard (station, frequency, time,
- * position) and handed to Miku Music, which files it as a liked track the library does not have
- * and marks it for acquisition. Miku Music owns that list; this file keeps the radio's own copy
- * so the like survives if Miku Music is not running or not installed, and re-sends anything not
+ * position) and handed to Hione Music, which files it as a liked track the library does not have
+ * and marks it for acquisition. Hione Music owns that list; this file keeps the radio's own copy
+ * so the like survives if Hione Music is not running or not installed, and re-sends anything not
  * yet acknowledged.
  *
- * Contract with Miku Music: broadcast ACTION to package com.miku.player, sender holds
- * com.miku.permission.SYSTEM_BRIDGE (signature). Extras: id, title, artist, album, cover_url,
+ * Contract with Hione Music: broadcast ACTION to package com.hione.player, sender holds
+ * com.hione.permission.SYSTEM_BRIDGE (signature). Extras: id, title, artist, album, cover_url,
  * web_url, station (call or PS), freq_khz, heard_at_ms, lat, lon (Double, may be absent),
  * source ("fm-songid" or "fm-rds").
  */
 object FmLikes {
 
     private const val TAG = "FmLikes"
-    const val ACTION = "com.miku.player.action.FM_TRACK_LIKED"
-    private const val PLAYER = "com.miku.player"
-    private const val PERMISSION = "com.miku.permission.SYSTEM_BRIDGE"
+    const val ACTION = "com.hione.player.action.FM_TRACK_LIKED"
+    private const val PLAYER = "com.hione.player"
+    private const val PERMISSION = "com.hione.permission.SYSTEM_BRIDGE"
 
     data class Like(
         val id: String,
@@ -104,9 +104,9 @@ object FmLikes {
             .putExtra("source", l.source).putExtra("unlike", unlike)
         l.lat?.let { i.putExtra("lat", it) }
         l.lon?.let { i.putExtra("lon", it) }
-        runCatching { ctx.sendBroadcast(i, PERMISSION) }.onFailure { Log.w(TAG, "could not reach Miku Music: $it") }
+        runCatching { ctx.sendBroadcast(i, PERMISSION) }.onFailure { Log.w(TAG, "could not reach Hione Music: $it") }
     }
 
-    /** Re-send every like, e.g. when Miku Music was reinstalled; Miku Music de-duplicates by id. */
+    /** Re-send every like, e.g. when Hione Music was reinstalled; Hione Music de-duplicates by id. */
     fun resendAll(ctx: Context) = all(ctx).forEach { send(ctx.applicationContext, it, unlike = false) }
 }

@@ -12,7 +12,7 @@ import android.util.Log
 
 /**
  * Always-on Fn pocket-lock applier, hosted in this app's foreground service so it survives the
- * music app being trimmed. Miku Music's MikuPocketLockManager does the same thing (plus the HUD)
+ * music app being trimmed. Hione Music's HionePocketLockManager does the same thing (plus the HUD)
  * while its process is alive; both are idempotent, so double-application is harmless.
  *
  * Everything here is root-free on the platform-signed build:

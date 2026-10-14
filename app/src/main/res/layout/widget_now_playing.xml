@@ -30,7 +30,7 @@
             android:id="@+id/widget_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Miku Music"
+            android:text="Hione Music"
             android:textColor="#E8F4F2"
             android:textSize="13sp"
             android:textStyle="bold"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="Nothing playing"
-            android:textColor="#39C5BB"
+            android:textColor="#FFAB2E"
             android:textSize="11sp"
             android:maxLines="1"
             android:ellipsize="end" />

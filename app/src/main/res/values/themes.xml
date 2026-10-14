@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MikuPlayer" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#04161A</item>
-        <item name="android:navigationBarColor">#04161A</item>
-        <item name="android:windowBackground">#04161A</item>
+    <style name="Theme.HionePlayer" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#121318</item>
+        <item name="android:navigationBarColor">#121318</item>
+        <item name="android:windowBackground">#121318</item>
     </style>
 
-    <style name="Theme.MikuLauncher" parent="android:Theme.Material.NoActionBar.Fullscreen">
+    <style name="Theme.HioneLauncher" parent="android:Theme.Material.NoActionBar.Fullscreen">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">#040D12</item>
+        <item name="android:windowBackground">#0C0D10</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowAnimationStyle">@style/MikuKdeWindowAnim</item>
+        <item name="android:windowAnimationStyle">@style/HioneKdeWindowAnim</item>
         <!-- Kill the Android 12+ system splash (app icon on a blob). The app draws its own
              cold-boot splash; the OS one just flashes an icon on every warm start. -->
-        <item name="android:windowSplashScreenBackground">#040D12</item>
+        <item name="android:windowSplashScreenBackground">#0C0D10</item>
         <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
         <item name="android:windowSplashScreenAnimationDuration">0</item>
     </style>
@@ -25,24 +25,24 @@
          to back), FALL APART (crumble + tumble + drop) when actually closed, and FLY IN
          when opened. Replaces the stock slide-off-to-the-right. -->
     <!--
-        The main Miku Music window, edge to edge.
+        The main Hione Music window, edge to edge.
 
         The parent theme sets FLAG_FULLSCREEN, which contradicts MainActivity showing the status bar
-        again: while the flag is set the framework lays the app out BELOW the bar, so Miku Music got
+        again: while the flag is set the framework lays the app out BELOW the bar, so Hione Music got
         720x1239 of a 720x1280 panel and the top 41px was dead space it was already painting nothing
         into. Dropping the flag lets the window cover the whole panel and the stock clock/battery bar
         bleed over the app's own background. Headers keep statusBarsPadding(), so no text collides
         with the glyphs. Only MainActivity: the alarm ring and the other full-bleed activities still
         want the fullscreen parent.
     -->
-    <style name="Theme.MikuMusic.EdgeToEdge" parent="Theme.MikuLauncher">
+    <style name="Theme.HioneMusic.EdgeToEdge" parent="Theme.HioneLauncher">
         <item name="android:windowFullscreen">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
-    <style name="MikuKdeWindowAnim">
+    <style name="HioneKdeWindowAnim">
         <!-- open an app -->
         <item name="android:activityOpenEnterAnimation">@anim/kde_flyin_in</item>
         <item name="android:taskOpenEnterAnimation">@anim/kde_flyin_in</item>

@@ -30,8 +30,8 @@ import java.io.FileDescriptor
  *  - read() returns 0 whether or not it copied anything (it returns copy_to_user's "bytes not
  *    copied"). So new data is detected by pre-filling the buffer and seeing whether it changed.
  *  - The stock driver copies only the first FOUR bytes, A and B, so C and D, which carry
- *    every character of the station name and of RadioText, never arrive. MikuOS patches that
- *    to eight (mikuos/build/patch_si4705_rds.py). On an unpatched driver C and D stay at the
+ *    every character of the station name and of RadioText, never arrive. HioneOS patches that
+ *    to eight (hioneos/build/patch_si4705_rds.py). On an unpatched driver C and D stay at the
  *    fill pattern, [wholeGroups] goes false, and only PI, PTY and the flags are decoded.
  *
  * WHY RAW SYSCALLS AND NOT File/FileInputStream. The vendor's sepolicy grants this app

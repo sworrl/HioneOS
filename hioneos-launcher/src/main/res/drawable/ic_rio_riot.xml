@@ -1,0 +1,66 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+
+    <!-- Rio Riot Retro Player Chassis (2002 Gunmetal & Cyber Orange) -->
+    <path
+        android:pathData="M 32,8 L 128,8 A 24,24 0 0 1 152,32 L 152,128 A 24,24 0 0 1 128,152 L 32,152 A 24,24 0 0 1 8,128 L 8,32 A 24,24 0 0 1 32,8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:angle="135"
+                android:endColor="#0A1218"
+                android:startColor="#1E2830"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Rio Riot Orange Trim -->
+    <path
+        android:pathData="M 32,8 L 128,8 A 24,24 0 0 1 152,32 L 152,128 A 24,24 0 0 1 128,152 L 32,152 A 24,24 0 0 1 8,128 L 8,32 A 24,24 0 0 1 32,8 Z"
+        android:strokeWidth="2.5">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:angle="90"
+                android:endColor="#FF6600"
+                android:startColor="#00E5FF"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Retro LCD Screen Box -->
+    <path
+        android:pathData="M 32,28 L 128,28 A 8,8 0 0 1 136,36 L 136,78 A 8,8 0 0 1 128,86 L 32,86 A 8,8 0 0 1 24,78 L 24,36 A 8,8 0 0 1 32,28 Z"
+        android:fillColor="#0D3834"
+        android:strokeColor="#00FFCC"
+        android:strokeWidth="1.5" />
+
+    <!-- LCD Text / Audio Wave Glyphs -->
+    <path
+        android:pathData="M 36,44 L 54,44 M 36,54 L 70,54 M 36,64 L 60,64"
+        android:strokeColor="#55FFDD"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+
+    <!-- Circular Navigation Wheel / Button Cluster -->
+    <path
+        android:pathData="M 80,120 A 24,24 0 1 1 80,119.9 Z"
+        android:fillColor="#151E24"
+        android:strokeColor="#FF6600"
+        android:strokeWidth="2.5" />
+
+    <!-- Center Action Pip -->
+    <path
+        android:pathData="M 80,120 A 8,8 0 1 1 80,119.9 Z"
+        android:fillColor="#00FFCC" />
+
+    <!-- Riot Stylized 'R' Accent -->
+    <path
+        android:pathData="M 94,40 L 108,40 C 114,40 118,44 118,49 C 118,54 114,58 108,58 L 94,58 Z M 108,58 L 118,72"
+        android:strokeColor="#FF6600"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

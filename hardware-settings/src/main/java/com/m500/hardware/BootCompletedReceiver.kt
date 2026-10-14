@@ -27,7 +27,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
                 // A14 stamps while-in-use camera eligibility on the service's
                 // FIRST start, and a BOOT_COMPLETED start is ineligible forever
                 // (verified live: even later TOP-context re-starts could not
-                // upgrade the running process). The MikuOS launcher pokes the
+                // upgrade the running process). The HioneOS launcher pokes the
                 // service from onResume (TOP = eligible), and the baked boot
                 // exec starts it from shell context (allow-listed = eligible).
             }

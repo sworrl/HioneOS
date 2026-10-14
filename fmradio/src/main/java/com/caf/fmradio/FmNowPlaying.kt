@@ -7,14 +7,14 @@ import android.provider.Settings
 import android.util.Log
 
 /**
- * Tells the rest of MikuOS what the radio is playing, the same way Miku Music does.
+ * Tells the rest of HioneOS what the radio is playing, the same way Hione Music does.
  *
  *  - SystemUI's now-playing HUD (the "toast" that slides in over any app) listens for
- *    `com.miku.player.action.TRACK_CHANGED`. Radio songs go out on that broadcast with
+ *    `com.hione.player.action.TRACK_CHANGED`. Radio songs go out on that broadcast with
  *    `openPackage=com.caf.fmradio`, so a tap opens the tuner, and the HUD stays quiet while the
  *    tuner is itself on screen.
- *  - The launcher widgets, AOD and lockscreen read Settings.Global `miku_now_playing_title` /
- *    `miku_now_playing_artist`. Those are written too, so they follow the radio while it plays.
+ *  - The launcher widgets, AOD and lockscreen read Settings.Global `hione_now_playing_title` /
+ *    `hione_now_playing_artist`. Those are written too, so they follow the radio while it plays.
  *
  * WHAT COUNTS AS A SONG. RT+ is the station saying "this is the artist, this is the title", so
  * a change there is a song change. Without RT+, RadioText is the best there is, but stations
@@ -25,8 +25,8 @@ import android.util.Log
 object FmNowPlaying {
 
     private const val TAG = "FmNowPlaying"
-    private const val ACTION = "com.miku.player.action.TRACK_CHANGED"
-    private const val SYSTEMUI = "com.miku.systemui"
+    private const val ACTION = "com.hione.player.action.TRACK_CHANGED"
+    private const val SYSTEMUI = "com.hione.systemui"
     private const val MIN_GAP_MS = 15_000L
     private const val RT_SETTLE_MS = 4_000L
 
@@ -69,7 +69,7 @@ object FmNowPlaying {
 
     private fun publish(ctx: Context, station: String, freqLabel: String, artist: String, title: String, stereo: Boolean?) {
         val app = ctx.applicationContext
-        val enabled = runCatching { Settings.Global.getInt(app.contentResolver, "miku_track_hud_enabled", 1) == 1 }
+        val enabled = runCatching { Settings.Global.getInt(app.contentResolver, "hione_track_hud_enabled", 1) == 1 }
             .getOrDefault(true)
         if (enabled) {
             val i = Intent(ACTION).setPackage(SYSTEMUI)
@@ -85,8 +85,8 @@ object FmNowPlaying {
             runCatching { app.sendBroadcast(i) }.onFailure { Log.w(TAG, "HUD broadcast failed: $it") }
         }
         runCatching {
-            Settings.Global.putString(app.contentResolver, "miku_now_playing_title", title)
-            Settings.Global.putString(app.contentResolver, "miku_now_playing_artist", artist)
+            Settings.Global.putString(app.contentResolver, "hione_now_playing_title", title)
+            Settings.Global.putString(app.contentResolver, "hione_now_playing_artist", artist)
         }.onFailure { Log.w(TAG, "now-playing keys not written: $it") }
         Log.i(TAG, "now playing on $station: $artist - $title")
     }

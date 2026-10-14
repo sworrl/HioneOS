@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.MikuUpdate" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/miku_bg</item>
-        <item name="android:statusBarColor">@color/miku_bg</item>
-        <item name="android:navigationBarColor">@color/miku_bg</item>
-    </style>
-</resources>

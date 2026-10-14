@@ -31,9 +31,9 @@ import kotlinx.coroutines.launch
  */
 // Deliberately NOT the main looper. The Wi-Fi fix does a synchronous HTTP lookup and a Wi-Fi
 // scan, so on the main thread every poll died in NetworkOnMainThreadException - caught by the
-// runCatching inside MikuLocationFusion, which is why this failed silently for a whole image.
+// runCatching inside HioneLocationFusion, which is why this failed silently for a whole image.
 private val locationThread = android.os.HandlerThread(
-    "miku-location", android.os.Process.THREAD_PRIORITY_BACKGROUND).apply { start() }
+    "hione-location", android.os.Process.THREAD_PRIORITY_BACKGROUND).apply { start() }
 private val locationTicker = android.os.Handler(locationThread.looper)
 
 class AmbientBrightnessService : Service() {
@@ -126,10 +126,10 @@ class AmbientBrightnessService : Service() {
         //
         // It runs on locationThread, not the main looper: a cold look is a Wi-Fi scan plus an
         // HTTP lookup, which the main thread is not allowed to do and would not want to wait for.
-        MikuLocationFusion.start(this)
+        HioneLocationFusion.start(this)
         locationTicker.post(object : Runnable {
             override fun run() {
-                MikuLocationFusion.pollWifi(this@AmbientBrightnessService)
+                HioneLocationFusion.pollWifi(this@AmbientBrightnessService)
                 locationTicker.postDelayed(this, 60_000L)
             }
         })
@@ -140,7 +140,7 @@ class AmbientBrightnessService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // While-in-use camera eligibility is stamped per start attempt: a
         // BOOT_COMPLETED start is ineligible forever, but a later start from a
-        // TOP app (the MikuOS launcher pokes us on every resume) or shell is
+        // TOP app (the HioneOS launcher pokes us on every resume) or shell is
         // eligible - retry the camera-type upgrade on each start command.
         if (!cameraTypeForeground) goForeground()
         return START_STICKY

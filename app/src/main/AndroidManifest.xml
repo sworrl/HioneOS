@@ -2,12 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <!-- Folder cover art (cover.jpg / folder.jpg beside the FLACs) is read through MediaStore.Images
          when raw file access to the SD card isn't available (scoped storage). -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- Platform-signed: lets the player self-grant its own "All files access" app-op at launch
-         (MikuStorageAccess) instead of stranding SD-card art/scans behind a Settings screen. -->
+         (HioneStorageAccess) instead of stranding SD-card art/scans behind a Settings screen. -->
     <uses-permission android:name="android.permission.MANAGE_APP_OPS_MODES" tools:ignore="ProtectedPermissions" />
     <!-- Alarm/haptics feedback (AlarmRingService, Haptics). Without this, Vibrator.vibrate
          no-ops and lint flags it as a MissingPermission crash risk. -->
@@ -52,9 +63,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <!-- USB DAC mode is switched by com.miku.sysbridge (system UID); see UsbDacManager. -->
-    <uses-permission android:name="com.miku.permission.SYSTEM_BRIDGE" />
-    <!-- Per-output volume while playing to several outputs (volume/MikuOutputVolumes):
+    <!-- USB DAC mode is switched by com.hione.sysbridge (system UID); see UsbDacManager. -->
+    <uses-permission android:name="com.hione.permission.SYSTEM_BRIDGE" />
+    <!-- Per-output volume while playing to several outputs (volume/HioneOutputVolumes):
          AudioManager.get/setDeviceVolume. Signature permissions; this app is platform-signed. -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS_PRIVILEGED"
         tools:ignore="ProtectedPermissions" />
@@ -68,7 +79,7 @@
          screen off / app backgrounded (confirmed live this wasn't happening as a plain Thread) —
          "dataSync" is the correct foregroundServiceType for background file-indexing work. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <!-- MikuRemoteGattService (remote/): BLE GATT peripheral so a phone's browser can drive playback.
+    <!-- HioneRemoteGattService (remote/): BLE GATT peripheral so a phone's browser can drive playback.
          "connectedDevice" is the foregroundServiceType for a Bluetooth peripheral session; the
          BLUETOOTH_ADVERTISE/CONNECT runtime grants above satisfy its API-34 prerequisite. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
@@ -118,18 +129,26 @@
         android:enableOnBackInvokedCallback="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@mipmap/ic_launcher"
-        android:label="Miku Music"
+        android:label="Hione Music"
         android:description="@string/app_description"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:theme="@style/Theme.MikuLauncher">
+        android:theme="@style/Theme.HioneLauncher">
 
-        <!-- Android Auto: declares MikuMusic as a media app (browse + play from the car head unit).
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.hione.player.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
+
+        <!-- Android Auto: declares HioneMusic as a media app (browse + play from the car head unit).
              The descriptor (@xml/automotive_app_desc) lists <uses name="media"/>; the browsable tree
              and playback are served by PlaybackService (a Media3 MediaLibraryService) via
-             MikuLibraryCallback. -->
+             HioneLibraryCallback. -->
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
@@ -140,12 +159,50 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/Theme.MikuMusic.EdgeToEdge">
+            android:theme="@style/Theme.HioneMusic.EdgeToEdge" />
+
+        <!-- Home-screen entries, one per mascot label set. Mascot.syncAliases enables the one the
+             active pack names and disables the others. The activity itself keeps no LAUNCHER
+             filter, so explicit launches by class name keep working whatever the pack. -->
+        <activity-alias
+            android:name=".MainActivityHione"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:enabled="true"
+            android:label="Hione Music"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityHits"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:label="Hione Hits"
+            android:icon="@mipmap/ic_launcher_hione"
+            android:roundIcon="@mipmap/ic_launcher_hione_round">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityPlain"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:label="Music"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
 
 
@@ -153,21 +210,22 @@
             android:name=".profiles.ListeningProfilesActivity"
             android:exported="false"
             android:label="Listening Profiles"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
-        <!-- Miku Music's playback settings (profiles, direct route, car audio, USB DAC output).
+        <!-- Hione Music's playback settings (profiles, direct route, car audio, USB DAC output).
              Not a DAC page and not a system settings target any more: the DAC page is the
-             Hardware app's (com.miku.action.DAC_SETTINGS). Kept exported for old callers. -->
+             Hardware app's (com.hione.action.DAC_SETTINGS). Kept exported for old callers. -->
         <activity
             android:name=".HardwareSettingsActivity"
             android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE"
             android:label="Playback settings"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
@@ -176,26 +234,27 @@
         <activity
             android:name=".FnLockSettingsActivity"
             android:exported="true"
-            android:label="Miku Fn Key &amp; Pocket Lock"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE"
+            android:label="Hione Fn Key &amp; Pocket Lock"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <action android:name="com.miku.player.action.FN_SETTINGS" />
+                <action android:name="com.hione.player.action.FN_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".MikuSettingsActivity"
+            android:name=".HioneSettingsActivity"
             android:exported="true"
-            android:label="Miku Settings"
-            android:icon="@drawable/ic_settings_miku"
+            android:label="Hione Settings"
+            android:icon="@drawable/ic_settings_hione"
             android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
@@ -206,18 +265,21 @@
         </activity>
 
 
+        <!-- FN_BUTTON_STATE_CHANGE comes from system_server (HiBy InputManagerService), which
+             passes any permission check. The permission stops other apps faking the cover switch. -->
         <receiver
-            android:name=".MikuFnLockReceiver"
-            android:exported="true">
+            android:name=".HioneFnLockReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
             <intent-filter android:priority="999">
                 <action android:name="FN_BUTTON_STATE_CHANGE" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".sentinel.MikuNotificationSentinelService"
+            android:name=".sentinel.HioneNotificationSentinelService"
             android:exported="true"
-            android:label="Miku Notification Filter"
+            android:label="Hione Notification Filter"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
@@ -225,12 +287,13 @@
         </service>
 
         <activity
-            android:name=".radio.MikuFMRadioActivity"
+            android:name=".radio.HioneFMRadioActivity"
             android:exported="true"
-            android:label="Miku FM Radio"
-            android:icon="@drawable/ic_fm_miku"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE"
+            android:label="Hione FM Radio"
+            android:icon="@drawable/ic_fm_hione"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <!-- No LAUNCHER entry: the real tuner (com.caf.fmradio) is the one "FM Radio" in the
@@ -257,19 +320,19 @@
              Priority 1000 ensures immediate dispatch from framework PhoneWindowManager and AudioService.
              Matches HiBy vendor LineCtrl receiver behavior. -->
         <receiver
-            android:name=".MikuMediaButtonReceiver"
+            android:name=".HioneMediaButtonReceiver"
             android:exported="true">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="hiby_media_button_action" />
                 <action android:name="ACTION_MEDIA_BUTTON" />
-                <action android:name="com.miku.action.MEDIA_BUTTON" />
+                <action android:name="com.hione.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".UsbDacTileService"
-            android:icon="@drawable/ic_miku_monitor_status"
+            android:icon="@drawable/ic_hione_monitor_status"
             android:label="USB DAC"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">
@@ -283,17 +346,23 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Whole-library tempo analysis (QM-DSP TempoTrackV2), only while charging. -->
+        <service
+            android:name=".bpm.HioneBpmScanJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <!-- Phone-as-Bluetooth-remote: BLE GATT server advertised ONLY while the Settings toggle
              is on (default off). Companion page: tools/remote-pwa (Web Bluetooth, no phone app). -->
         <service
-            android:name=".remote.MikuRemoteGattService"
+            android:name=".remote.HioneRemoteGattService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
 
         <service
-            android:name=".launcher.MikuLiveWallpaperService"
-            android:label="Miku Live Wallpaper"
-            android:icon="@drawable/ic_search_head_miku"
+            android:name=".launcher.HioneLiveWallpaperService"
+            android:label="Hione Live Wallpaper"
+            android:icon="@drawable/ic_search_head_hione"
             android:permission="android.permission.BIND_WALLPAPER"
             android:exported="true">
             <intent-filter>
@@ -301,12 +370,12 @@
             </intent-filter>
             <meta-data
                 android:name="android.service.wallpaper"
-                android:resource="@xml/miku_wallpaper_info" />
+                android:resource="@xml/hione_wallpaper_info" />
         </service>
         <receiver
-            android:name=".MikuMusicWidget"
+            android:name=".HioneMusicWidget"
             android:exported="true"
-            android:label="Miku Music Now Playing">
+            android:label="Hione Music Now Playing">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -316,9 +385,9 @@
         </receiver>
 
         <receiver
-            android:name=".MikuTapeWidget"
+            android:name=".HioneTapeWidget"
             android:exported="true"
-            android:label="Miku Music Tape Deck">
+            android:label="Hione Music Tape Deck">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -331,21 +400,41 @@
             android:name=".AlarmReceiver"
             android:exported="false" />
 
-        <!-- Cross-app preference bridge: the MikuOS launcher's quick-settings shade flips
+        <!-- Cross-app preference bridge: the HioneOS launcher's quick-settings shade flips
              playback behavior (pause-on-unplug) live via this broadcast. -->
         <receiver
-            android:name=".MikuPrefsReceiver"
-            android:exported="true">
+            android:name=".HionePrefsReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
             <intent-filter>
-                <action android:name="com.miku.player.SET_PAUSE_ON_UNPLUG" />
-                <action android:name="com.miku.player.action.TOGGLE_LIKE" />
-                <action android:name="com.miku.player.action.SET_LIKE" />
-                <action android:name="com.miku.player.action.PROFILE" />
-                <action android:name="com.miku.player.action.PRESET_SELFTEST" />
-                <action android:name="com.miku.player.action.FORCE_LIBRARY_SCAN" />
-                <action android:name="com.miku.player.action.RESCAN_LIBRARY" />
-                <action android:name="com.miku.player.action.SET_INGEST_ENABLED" />
-                <action android:name="com.miku.player.action.PLAY_RANDOM" />
+                <action android:name="com.hione.player.SET_PAUSE_ON_UNPLUG" />
+                <action android:name="com.hione.player.action.TOGGLE_LIKE" />
+                <action android:name="com.hione.player.action.SET_LIKE" />
+                <action android:name="com.hione.player.action.PROFILE" />
+                <action android:name="com.hione.player.action.PRESET_SELFTEST" />
+                <action android:name="com.hione.player.action.FORCE_LIBRARY_SCAN" />
+                <action android:name="com.hione.player.action.RESCAN_LIBRARY" />
+                <action android:name="com.hione.player.action.SET_INGEST_ENABLED" />
+                <action android:name="com.hione.player.action.PLAY_RANDOM" />
+            </intent-filter>
+        </receiver>
+
+        <!-- The same receiver for adb (`adb shell am broadcast -a ... -p com.hione.player`): the
+             shell holds DUMP, other apps cannot get it. Dev and test actions only. -->
+        <receiver
+            android:name=".HionePrefsShellReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="com.hione.player.action.PROFILE" />
+                <action android:name="com.hione.player.action.PRESET_SELFTEST" />
+                <action android:name="com.hione.player.action.FORCE_LIBRARY_SCAN" />
+                <action android:name="com.hione.player.action.RESCAN_LIBRARY" />
+                <!-- hionemeasure (see MeasureShell in HionePrefsReceiver.kt) -->
+                <action android:name="com.hione.player.action.PLAY_FILE" />
+                <action android:name="com.hione.player.action.MEASURE_STOP" />
+                <action android:name="com.hione.player.action.MEASURE_STATUS" />
+                <action android:name="com.hione.player.action.DAC_SET" />
             </intent-filter>
         </receiver>
 
@@ -355,9 +444,9 @@
         <receiver
             android:name=".wanted.FmTrackLikedReceiver"
             android:exported="true"
-            android:permission="com.miku.permission.SYSTEM_BRIDGE">
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
             <intent-filter>
-                <action android:name="com.miku.player.action.FM_TRACK_LIKED" />
+                <action android:name="com.hione.player.action.FM_TRACK_LIKED" />
             </intent-filter>
         </receiver>
 
@@ -366,26 +455,26 @@
             android:name=".stats.ListeningStatsActivity"
             android:exported="false"
             android:label="Listening Stats"
-            android:theme="@style/Theme.MikuLauncher"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
-        <!-- Listening stats → Miku Rewind (Wrapped-style story cards over the same listen DB;
+        <!-- Listening stats → Hione Rewind (Wrapped-style story cards over the same listen DB;
              share PNGs go through the statsexport FileProvider below). -->
         <activity
-            android:name=".stats.MikuRewindActivity"
+            android:name=".stats.HioneRewindActivity"
             android:exported="false"
-            android:label="Miku Rewind"
-            android:theme="@style/Theme.MikuLauncher"
+            android:label="Hione Rewind"
+            android:theme="@style/Theme.HioneLauncher"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
         <!-- Listening-stats CSV export (StatsRepository.exportCsv): share-sheet grant for files
-             under Android/data/com.miku.player/files/stats/. Separate authority from the HUD art
+             under Android/data/com.hione.player/files/stats/. Separate authority from the HUD art
              provider so its cache-path exposure stays untouched. -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.miku.player.statsexport"
+            android:authorities="com.hione.player.statsexport"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -393,10 +482,10 @@
                 android:resource="@xml/stats_export_paths" />
         </provider>
 
-        <!-- Now-playing HUD art for MikuOS SystemUI (MikuTrackHud): read-granted per broadcast. -->
+        <!-- Now-playing HUD art for HioneOS SystemUI (HioneTrackHud): read-granted per broadcast. -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.miku.player.hudart"
+            android:authorities="com.hione.player.hudart"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -444,12 +533,12 @@
             android:turnScreenOn="true"
             android:taskAffinity=""
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.MikuPlayer" />
+            android:theme="@style/Theme.HionePlayer" />
 
         <receiver
-            android:name=".MikuClockWidget"
+            android:name=".HioneClockWidget"
             android:exported="true"
-            android:label="Miku Music Clock">
+            android:label="Hione Music Clock">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -471,14 +560,14 @@
             </intent-filter>
         </service>
 
-        <!-- Fullscreen Miku Cyber HUD Modal for Hardware Fn Switch events -->
+        <!-- Fullscreen Hione Cyber HUD Modal for Hardware Fn Switch events -->
         <activity
             android:name=".FnLockHudActivity"
-            android:exported="true"
+            android:exported="false"
             android:launchMode="singleTop"
             android:showOnLockScreen="true"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.MikuPlayer" />
+            android:theme="@style/Theme.HionePlayer" />
 
         <!-- Skeuomorphic booklet / physical-media art viewer (booklet/). The ONLY screen allowed to
              rotate: booklet scans are usually wide, so it follows the sensor while the rest of the
@@ -488,14 +577,14 @@
             android:exported="false"
             android:screenOrientation="fullSensor"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
-            android:theme="@style/Theme.MikuLauncher" />
+            android:theme="@style/Theme.HioneLauncher" />
 
     
         <meta-data android:name="androidx.car.app.minCarApiLevel" android:value="1"/>
         <service
-            android:name=".car.MikuCarAppService"
-            android:label="Miku Auto"
-            android:icon="@drawable/ic_miku_music_brand"
+            android:name=".car.HioneCarAppService"
+            android:label="Hione Auto"
+            android:icon="@drawable/ic_hione_music_brand"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />

@@ -2,7 +2,7 @@
 <resources>
     <!-- Same base theme the app used before. The window starts on the app's dark color so
          launch does not flash grey before the tuner screen draws. -->
-    <style name="Theme.MikuFM" parent="android:Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:windowBackground">#0B1418</item>
+    <style name="Theme.HioneFM" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">#111216</item>
     </style>
 </resources>

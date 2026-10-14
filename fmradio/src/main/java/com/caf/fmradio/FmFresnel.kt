@@ -54,7 +54,7 @@ object FmFresnel {
     private const val ELEVATION_API = "https://api.open-meteo.com/v1/elevation"
     private const val MAX_PER_REQUEST = 100
     private const val TIMEOUT_MS = 12_000
-    private const val CACHE_DIR = "miku_fresnel_v2"
+    private const val CACHE_DIR = "hione_fresnel_v2"
 
     data class Point(
         /** Metres along the path from the listener. */
@@ -256,7 +256,7 @@ object FmFresnel {
         // does not invalidate a 60-sample fetch.
         val key = "%.3f_%.3f_%s_%d".format(java.util.Locale.US, lat, lon, st.call, st.khz)
         // v2: sample count scales with distance. The v1 cache held 60 fixed samples.
-        File(ctx.cacheDir, "miku_fresnel").takeIf { it.exists() }?.deleteRecursively()
+        File(ctx.cacheDir, "hione_fresnel").takeIf { it.exists() }?.deleteRecursively()
         return File(File(ctx.cacheDir, CACHE_DIR).apply { mkdirs() }, "$key.json")
     }
 

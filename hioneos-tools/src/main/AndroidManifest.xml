@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <!-- ===================================================================================
+         Clock
+         =================================================================================== -->
+    <!-- Exact alarms survive nothing: not a reboot, not a clock change. Re-arm on boot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- USE_EXACT_ALARM is granted at install for an alarm clock and never revoked, so it is the
+         one that actually matters. SCHEDULE_EXACT_ALARM is kept because it is what the
+         "Alarms & reminders" settings page lists, and what stock DeskClock declared. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Without it the ring notification downgrades to a heads-up and a sleeping device never
+         shows the ring screen. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- systemExempted is the type Android 14 reserves for alarm apps holding USE_EXACT_ALARM;
+         mediaPlayback is declared as a fallback in case the exemption is refused. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Hione Music's PLAY_RANDOM receiver (alarm wake-up music, HioneMusicBridge) needs the
+         HioneOS signature permission from the sender. -->
+    <uses-permission android:name="com.hione.permission.SYSTEM_BRIDGE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- HioneOS keeps theater_mode_on=1 (charger plug wakes strobed the screen). Theater mode also
+         blocks ACQUIRE_CAUSES_WAKEUP, so the ring service lifts it for the length of a ring and
+         puts it back. Signature permission: granted by the platform key, no whitelist needed. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Lets the "wake to Hione Music" handoff give Hione Music a short window to start its own
+         playback service from the background. Signature permission, platform key grants it. -->
+    <uses-permission android:name="android.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- ===================================================================================
+         Calendar
+         =================================================================================== -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+
+    <queries>
+        <!-- Clock checks for Hione Music (its alarms, and wake-to-music). -->
+        <package android:name="com.hione.player" />
+        <!-- Event location opens a map app. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_clock"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HioneTools"
+        tools:ignore="DataExtractionRules">
+
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.hione.tools.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
+
+        <!-- ================================ Clock ================================ -->
+
+        <activity
+            android:name=".clock.ClockActivity"
+            android:exported="true"
+            android:label="@string/clock_label"
+            android:icon="@mipmap/ic_clock"
+            android:roundIcon="@mipmap/ic_clock"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.hione.tools.clock"
+            android:directBootAware="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- AlarmClock API. Stock DeskClock put every action behind the framework's SET_ALARM
+             permission (a normal permission that assistants and alarm-setting apps declare).
+             Here the two that only open a screen, SHOW_ALARMS and SHOW_TIMERS, are left open:
+             the HioneOS launcher falls back to SHOW_ALARMS when its clock is tapped and does not
+             hold SET_ALARM, so behind the permission that tap would fail. Everything that
+             changes state (set, dismiss, snooze) stays behind SET_ALARM on the two aliases.
+             HandleApiCalls ignores state-changing actions that arrive through the open entry. -->
+        <activity
+            android:name=".clock.HandleApiCalls"
+            android:exported="true"
+            android:directBootAware="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.SHOW_ALARMS" />
+                <action android:name="android.intent.action.SHOW_TIMERS" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity>
+
+        <activity-alias
+            android:name=".clock.HandleApiCallsProtected"
+            android:exported="true"
+            android:permission="com.android.alarm.permission.SET_ALARM"
+            android:targetActivity=".clock.HandleApiCalls">
+            <intent-filter>
+                <action android:name="android.intent.action.DISMISS_ALARM" />
+                <action android:name="android.intent.action.DISMISS_TIMER" />
+                <action android:name="android.intent.action.SNOOZE_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".clock.HandleSetAlarmApiCalls"
+            android:exported="true"
+            android:permission="com.android.alarm.permission.SET_ALARM"
+            android:targetActivity=".clock.HandleApiCalls">
+            <intent-filter>
+                <action android:name="android.intent.action.SET_ALARM" />
+                <action android:name="android.intent.action.SET_TIMER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity
+            android:name=".clock.RingActivity"
+            android:exported="false"
+            android:directBootAware="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity="com.hione.tools.ring"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
+            android:theme="@style/Theme.HioneTools.Ring" />
+
+        <service
+            android:name=".clock.RingService"
+            android:exported="false"
+            android:directBootAware="true"
+            android:foregroundServiceType="systemExempted|mediaPlayback" />
+
+        <receiver
+            android:name=".clock.ClockReceiver"
+            android:exported="false"
+            android:directBootAware="true" />
+
+        <receiver
+            android:name=".clock.ClockInitReceiver"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Stock DeskClock was also the default screensaver (daydream). Keep one around so the
+             Screen saver setting does not go empty when DeskClock leaves the image. -->
+        <service
+            android:name=".clock.ClockDream"
+            android:exported="true"
+            android:label="@string/clock_label"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <!-- ============================== Calculator ============================== -->
+
+        <activity
+            android:name=".calc.CalculatorActivity"
+            android:exported="true"
+            android:label="@string/calc_label"
+            android:icon="@mipmap/ic_calculator"
+            android:roundIcon="@mipmap/ic_calculator"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.hione.tools.calc"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALCULATOR" />
+            </intent-filter>
+        </activity>
+
+        <!-- =============================== Calendar =============================== -->
+
+        <activity
+            android:name=".calendar.CalendarActivity"
+            android:exported="true"
+            android:label="@string/calendar_label"
+            android:icon="@mipmap/ic_calendar"
+            android:roundIcon="@mipmap/ic_calendar"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.hione.tools.calendar"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALENDAR" />
+            </intent-filter>
+            <!-- content://com.android.calendar/time/<millis>; the provider types it time/epoch. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="time/epoch" />
+                <data android:host="com.android.calendar" />
+                <data android:scheme="content" />
+            </intent-filter>
+        </activity>
+
+        <!-- content://com.android.calendar/events/<id>, typed vnd.android.cursor.item/event. -->
+        <activity
+            android:name=".calendar.EventInfoActivity"
+            android:exported="true"
+            android:label="@string/calendar_label"
+            android:icon="@mipmap/ic_calendar"
+            android:taskAffinity="com.hione.tools.calendar"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/event" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".calendar.EditEventActivity"
+            android:exported="true"
+            android:label="@string/calendar_label"
+            android:icon="@mipmap/ic_calendar"
+            android:taskAffinity="com.hione.tools.calendar"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.INSERT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.INSERT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/event" />
+            </intent-filter>
+        </activity>
+
+        <!-- .ics files from a browser download, mail attachment or file manager. -->
+        <activity
+            android:name=".calendar.IcsImportActivity"
+            android:exported="true"
+            android:label="@string/ics_import_label"
+            android:icon="@mipmap/ic_calendar"
+            android:taskAffinity="com.hione.tools.calendar"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="text/calendar" />
+                <data android:mimeType="text/x-vcalendar" />
+                <data android:mimeType="application/ics" />
+            </intent-filter>
+        </activity>
+
+        <!-- The calendar provider only schedules reminders; showing them was stock Calendar's
+             job. Without this receiver, removing stock Calendar silently kills every event
+             reminder on the device. -->
+        <receiver
+            android:name=".calendar.ReminderReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.EVENT_REMINDER" />
+                <data android:scheme="content" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".calendar.ReminderActionReceiver"
+            android:exported="false" />
+    </application>
+</manifest>

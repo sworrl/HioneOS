@@ -1,6 +1,6 @@
 // projectM background for the FM tuner. JNI for com.caf.fmradio.FmProjectMNative.
 //
-// Ported from Miku Music's projectm_native.cpp (app module), cut down to what a background
+// Ported from Hione Music's projectm_native.cpp (app module), cut down to what a background
 // needs: one instance, a playlist over a small curated preset dir, PCM straight from the radio,
 // and a caller-driven clock so the idle state can run slow instead of at wall-clock speed.
 //

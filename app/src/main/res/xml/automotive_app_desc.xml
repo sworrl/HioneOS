@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android Auto app descriptor. Declares MikuMusic as a MEDIA app so Android Auto surfaces it as a
+<!-- Android Auto app descriptor. Declares HioneMusic as a MEDIA app so Android Auto surfaces it as a
      browsable/playable media source on the car head unit. Referenced from AndroidManifest.xml via
      the com.google.android.gms.car.application meta-data. -->
 <automotiveApp>

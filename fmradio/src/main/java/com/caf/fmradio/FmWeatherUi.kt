@@ -36,7 +36,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /*
- * The WEATHER tab's own look: a Miku sky instead of the cyber panel. Teal-to-cyan daylight,
+ * The WEATHER tab's own look: a Hione sky instead of the cyber panel. Teal-to-cyan daylight,
  * a soft gold sun, drifting clouds and a light rain; a pink bolt when the Weather Service has
  * something severe out. Everything it lists is still reference data: NOAA Weather Radio is at
  * 162 MHz and this tuner stops at 108.
@@ -80,7 +80,7 @@ fun ColumnScope.FmWeatherRadioList(st: FmState) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("ALERTS", color = SunGold, fontSize = 9.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont)
-                    Text("National Weather Service", color = MikuTextSecondary, fontSize = 7.5.sp)
+                    Text("National Weather Service", color = HioneTextSecondary, fontSize = 7.5.sp)
                 }
                 Box(
                     Modifier.size(44.dp).clip(CircleShape).pressable { FmRadioManager.refreshWeatherAlerts() },
@@ -110,7 +110,7 @@ fun ColumnScope.FmWeatherRadioList(st: FmState) {
                 Text(
                     "For a weather radio or ham handheld. This tuner can't receive 162 MHz (the Si4705 " +
                         "stops at 108 MHz), so these are listed, not tunable.",
-                    color = MikuTextSecondary, fontSize = 7.5.sp, lineHeight = 10.sp,
+                    color = HioneTextSecondary, fontSize = 7.5.sp, lineHeight = 10.sp,
                 )
             }
         }
@@ -129,7 +129,7 @@ fun ColumnScope.FmWeatherRadioList(st: FmState) {
 @Composable
 private fun WxNote(text: String) {
     Text(
-        text, color = MikuTextPrimary, fontSize = 9.sp,
+        text, color = HioneTextPrimary, fontSize = 9.sp,
         modifier = Modifier.fillMaxWidth()
             .glass(RoundedCornerShape(12.dp), accent = WxAccent, accent2 = SunGold, fill = WxCard, rimAlpha = 0.35f, shine = 0.6f)
             .padding(12.dp)
@@ -152,17 +152,17 @@ private fun AlertCard(a: FmWeatherRadio.Alert, open: Boolean, onToggle: () -> Un
                 Text(a.event, color = c, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 Text(
                     listOfNotNull(a.severity, a.urgency, a.expires?.let { "until ${shortTime(it)}" }).joinToString(" · "),
-                    color = MikuTextSecondary, fontSize = 8.sp,
+                    color = HioneTextSecondary, fontSize = 8.sp,
                 )
             }
             Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = c, modifier = Modifier.size(20.dp))
         }
         a.headline?.let {
             Spacer(Modifier.height(4.dp))
-            Text(it, color = MikuTextPrimary, fontSize = 8.5.sp, lineHeight = 11.sp, maxLines = if (open) 6 else 2, overflow = TextOverflow.Ellipsis)
+            Text(it, color = HioneTextPrimary, fontSize = 8.5.sp, lineHeight = 11.sp, maxLines = if (open) 6 else 2, overflow = TextOverflow.Ellipsis)
         }
         if (open) {
-            a.areas?.let { Spacer(Modifier.height(4.dp)); Text("Areas: $it", color = MikuTextSecondary, fontSize = 8.sp, lineHeight = 10.5.sp) }
+            a.areas?.let { Spacer(Modifier.height(4.dp)); Text("Areas: $it", color = HioneTextSecondary, fontSize = 8.sp, lineHeight = 10.5.sp) }
             a.description?.let { Spacer(Modifier.height(6.dp)); Text(it.trim(), color = Color.White, fontSize = 8.5.sp, lineHeight = 11.5.sp) }
             a.instruction?.let {
                 Spacer(Modifier.height(6.dp))
@@ -170,7 +170,7 @@ private fun AlertCard(a: FmWeatherRadio.Alert, open: Boolean, onToggle: () -> Un
                 Text(it.trim(), color = Color.White, fontSize = 8.5.sp, lineHeight = 11.5.sp)
             }
             Spacer(Modifier.height(4.dp))
-            Text(a.sender ?: "National Weather Service", color = MikuTextSecondary, fontSize = 7.5.sp)
+            Text(a.sender ?: "National Weather Service", color = HioneTextSecondary, fontSize = 7.5.sp)
         }
     }
 }
@@ -183,7 +183,7 @@ private fun shortTime(iso: String): String = runCatching {
 
 @Composable
 private fun TransmitterRow(t: FmWeatherRadio.Transmitter) {
-    val statusColor = when (t.status) { "NORMAL" -> MikuTeal; "DEGRADED" -> CyberAmber; else -> MikuNeonPink }
+    val statusColor = when (t.status) { "NORMAL" -> HioneTeal; "DEGRADED" -> CyberAmber; else -> HioneNeonPink }
     var open by remember(t.call, t.mhz) { mutableStateOf(false) }
     Column(
         Modifier.fillMaxWidth()
@@ -212,7 +212,7 @@ private fun TransmitterRow(t: FmWeatherRadio.Transmitter) {
             Text(
                 listOfNotNull("${t.city}, ${t.state}", t.watts?.let { w -> if (w >= 1000) "${w / 1000.0} kW" else "$w W" },
                               t.wfo?.let { "NWS $it" }).joinToString(" · "),
-                color = MikuTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                color = HioneTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
         Column(horizontalAlignment = Alignment.End) {
@@ -227,9 +227,9 @@ private fun TransmitterRow(t: FmWeatherRadio.Transmitter) {
                 "%.3f MHz is past this tuner. With the driver unlocked we measured the Si4705 at " +
                 "64.0 to 108.0 MHz, and every frequency above 108 lands on 108.0. On a weather " +
                 "radio or scanner, set %s.", t.mhz, t.wx.ifBlank { "this frequency" }),
-            color = MikuTextPrimary, fontSize = 9.sp,
+            color = HioneTextPrimary, fontSize = 9.sp,
         )
-        t.wfo?.let { Text("Programmed by NWS $it. Its alerts for your area are listed above.", color = MikuTextSecondary, fontSize = 8.sp) }
+        t.wfo?.let { Text("Programmed by NWS $it. Its alerts for your area are listed above.", color = HioneTextSecondary, fontSize = 8.sp) }
         Spacer(Modifier.height(6.dp))
         Box(
             Modifier.clip(RoundedCornerShape(10.dp)).background(SunGold.copy(alpha = 0.22f))
@@ -292,12 +292,12 @@ private fun WeatherSky(severe: Boolean, modifier: Modifier) {
                 bolt.moveTo(bx, by); bolt.lineTo(bx - 8.dp.toPx(), by + 22.dp.toPx()); bolt.lineTo(bx - 1.dp.toPx(), by + 22.dp.toPx())
                 bolt.lineTo(bx - 7.dp.toPx(), by + 44.dp.toPx()); bolt.lineTo(bx + 10.dp.toPx(), by + 15.dp.toPx())
                 bolt.lineTo(bx + 2.dp.toPx(), by + 15.dp.toPx()); bolt.close()
-                drawPath(bolt, MikuPink)
+                drawPath(bolt, HionePink)
             }
         }
         Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 12.dp, vertical = 8.dp)) {
             Text("ミクの天気", color = Color.White, fontSize = 15.sp, fontFamily = MochiyPopFont)
-            Text("MIKU WEATHER · NOAA WEATHER RADIO", color = Color.White.copy(alpha = 0.85f), fontSize = 7.5.sp,
+            Text("HIONE WEATHER · NOAA WEATHER RADIO", color = Color.White.copy(alpha = 0.85f), fontSize = 7.5.sp,
                  fontWeight = FontWeight.Bold, fontFamily = AudiowideFont)
         }
     }

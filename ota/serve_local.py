@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Serve the staged OTA tree (mikuos/ota/out) on the LAN, for testing Miku Update before the
+"""Serve the staged OTA tree (hioneos/ota/out) on the LAN, for testing Hione Update before the
 real host. Same layout as the server: http://<this-pc>:8000/ota/<channel>/manifest.json.
 
 Adds what `python -m http.server` lacks: single byte-range requests (206 / Content-Range), so
 download resume can be tested, plus the cache headers the real server should send.
 
-    mikuos/ota/serve_local.py                 # serves mikuos/ota/out on 0.0.0.0:8000
-    mikuos/ota/serve_local.py --throttle 200  # cap at 200 KB/s to test progress and resume
+    hioneos/ota/serve_local.py                 # serves hioneos/ota/out on 0.0.0.0:8000
+    hioneos/ota/serve_local.py --throttle 200  # cap at 200 KB/s to test progress and resume
 
-Then on the device: Miku Update > About > Test server > http://<this-pc-ip>:8000/ota/
+Then on the device: Hione Update > About > Test server > http://<this-pc-ip>:8000/ota/
 """
 import argparse
 import os
@@ -106,7 +106,7 @@ def lan_ip():
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dir", default=os.path.join(here, "out"), help="staged tree (default mikuos/ota/out)")
+    ap.add_argument("--dir", default=os.path.join(here, "out"), help="staged tree (default hioneos/ota/out)")
     ap.add_argument("--bind", default="0.0.0.0")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--throttle", type=int, default=0, help="KB/s cap, to watch progress and test resume")

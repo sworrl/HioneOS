@@ -66,7 +66,15 @@ object FmReach {
     const val NOISE_FLOOR_DBUV = 10
 
     private const val RX_HEIGHT_M = 1.5
-    private const val FREQ_MHZ = 98.0
+
+    /**
+     * The frequency term uses the station's own frequency. It used to be a fixed 98 MHz, the
+     * middle of the US band, which is within 1 dB anywhere in 88-108 but 2.2 dB pessimistic for
+     * a Japanese station at 76 MHz (Egli's loss rises 20 log f). Out-of-band values (AM rows)
+     * fall back to 98.
+     */
+    fun freqMhz(st: FmStationCatalogue.Station): Double =
+        (st.khz / 1000.0).takeIf { it in 64.0..108.0 } ?: 98.0
 
     /**
      * Headphone-cable antenna, indoors, before anything has been measured. From the first
@@ -98,13 +106,13 @@ object FmReach {
         val d = st.distanceKm.coerceAtLeast(0.5)
         val erpDbm = 10 * log10(erpKw * 1e6)
         // Egli: L = 20log f + 40log d - 20log hb + 76.3 - 10log hm   (f MHz, d km, h m; hm < 10 m)
-        var loss = 20 * log10(FREQ_MHZ) + 40 * log10(d) - 20 * log10(hTx) + 76.3 - 10 * log10(RX_HEIGHT_M)
+        val fMhz = freqMhz(st)
+        var loss = 20 * log10(fMhz) + 40 * log10(d) - 20 * log10(hTx) + 76.3 - 10 * log10(RX_HEIGHT_M)
         val horizon = horizonKm(hTx)
         if (d > horizon) loss += 0.35 * (d - horizon)      // diffraction beyond the horizon, ~0.3-0.4 dB/km at VHF
         val egli = erpDbm - loss + 107.0                    // dBm → dBµV across 50 Ω
         if (terrainLossDb == null) return egli
         // With the real terrain: free space less its diffraction loss, never above Egli.
-        val fMhz = st.khz / 1000.0
         val freeSpace = erpDbm - (32.45 + 20 * log10(fMhz) + 20 * log10(d)) + 107.0
         return min(egli, freeSpace - terrainLossDb)
     }

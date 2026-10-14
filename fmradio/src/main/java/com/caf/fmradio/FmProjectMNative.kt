@@ -5,7 +5,7 @@ import android.util.Log
 import java.io.File
 
 /**
- * libfmprojectm: libprojectM 4.2 (the same vendored tree Miku Music's cassette mode uses) behind a
+ * libfmprojectm: libprojectM 4.2 (the same vendored tree Hione Music's cassette mode uses) behind a
  * JNI wrapper bound to this package. See src/main/cpp/fm_projectm_jni.cpp.
  *
  * Everything except [available], [version] and [ensurePresets] must be called on the GL thread
@@ -33,7 +33,7 @@ object FmProjectMNative {
      * The curated set shipped in assets/fm_presets. Bump when that set changes; the marker in the
      * extracted dir is compared against it and a mismatch re-syncs.
      */
-    private const val LIBRARY_ID = "fm-v1-miku56"
+    private const val LIBRARY_ID = "fm-v1-hione56"
     private const val ASSET_DIR = "fm_presets"
 
     @Volatile private var presetDir: String? = null

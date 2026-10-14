@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Miku Music</string>
-    <string name="app_description">Miku Music, an open source music player</string>
+    <string name="app_name">Hione Music</string>
+    <string name="app_description">Hione Music, an open source music player</string>
     <string name="hardware_settings_title">M500 Hardware &amp; DAC</string>
     <string name="hardware_settings_summary">Fn pocket lock and bit-perfect USB DAC</string>
 </resources>

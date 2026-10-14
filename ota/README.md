@@ -1,22 +1,22 @@
-# MikuOS over-the-air updates
+# HioneOS over-the-air updates
 
-Two tiers, one device app (Miku Update, `com.miku.update`, module `miku-player-kotlin/mikuos-update`)
-and a static backend at `https://mikuos.falcontechnix.com/ota/`.
+Two tiers, one device app (Hione Update, `com.hione.update`, module `hione-player-kotlin/hioneos-update`)
+and a static backend at `https://hioneos.falcontechnix.com/ota/`.
 
 | Tier | What | How it gets on the device |
 |---|---|---|
-| App updates | Newer builds of MikuOS's own system apps: `com.miku.*` and `com.m500.hardware` | Miku Update installs them silently as `/data` updates over the image copies |
-| System updates | Everything else: the FM app, driver patches, overlays, build props, debloat, new partitions, new apps | A full image through the web installer (`https://mikuos.falcontechnix.com/install/`) on a PC. Miku Update shows a card with the link and a QR code |
+| App updates | Newer builds of HioneOS's own system apps: `com.hione.*` and `com.m500.hardware` | Hione Update installs them silently as `/data` updates over the image copies |
+| System updates | Everything else: the FM app, driver patches, overlays, build props, debloat, new partitions, new apps | A full image through the web installer (`https://hioneos.falcontechnix.com/install/`) on a PC. Hione Update shows a card with the link and a QR code |
 
 **The FM app (`com.caf.fmradio`) is never an app update.** A `/data` copy loses the shared linker
 namespace its JNI needs and the tuner stops working. The device app refuses it whatever a manifest
 says, and `publish.py` refuses to list it.
 
 A future on-device A/B path (`android.os.UpdateEngine` with a `payload.bin`) has a documented seam in
-`mikuos-update/.../ota/SystemUpdatePath.kt` (`AbUpdateEnginePath`). It is not implemented.
+`hioneos-update/.../ota/SystemUpdatePath.kt` (`AbUpdateEnginePath`). It is not implemented.
 
 ```
-mikuos/ota/
+hioneos/ota/
   keys/ota-signing-primary-p521.pub.pem   public keys, embedded in the app at build time
   keys/ota-signing-backup-p521.pub.pem
   publish.py                              collect APKs, write + sign + verify manifest, stage, upload
@@ -35,12 +35,12 @@ mikuos/ota/
   apks/<package>/<versionCode>/<package>-<versionCode>.apk     immutable, never overwritten
 ```
 
-Deployed to `root@10.10.10.5:/var/www/html/falcontechnix/mikuos/ota/` (rieska, behind Cloudflare),
-the same host and webroot that `~/Documents/GitHub/webdev/mikuos-site/publish.sh` uses for the site
+Deployed to `root@10.10.10.5:/var/www/html/falcontechnix/hioneos/ota/` (rieska, behind Cloudflare),
+the same host and webroot that `~/Documents/GitHub/webdev/hioneos-site/publish.sh` uses for the site
 and the web installer. Files are chowned `1000:1000` like the site.
 
 **Before the first upload:** that site `publish.sh` runs `rsync --delete` over the whole
-`mikuos/` webroot, so it would delete `/ota/` the next time the site is published. Add
+`hioneos/` webroot, so it would delete `/ota/` the next time the site is published. Add
 `--exclude /ota` to its rsync line. `publish.py --upload` refuses to run until it is there.
 
 ## manifest.json (schema_version 1)
@@ -57,14 +57,14 @@ and the web installer. Files are chowned `1000:1000` like the site.
     "required": false,
     "build": "0.2.0",
     "notes": "What the full image brings.",
-    "installer_url": "https://mikuos.falcontechnix.com/install/"
+    "installer_url": "https://hioneos.falcontechnix.com/install/"
   },
   "apks": [
     {
-      "package": "com.miku.player",
+      "package": "com.hione.player",
       "versionCode": 2315,
       "versionName": "2.0.315",
-      "url": "../apks/com.miku.player/2315/com.miku.player-2315.apk",
+      "url": "../apks/com.hione.player/2315/com.hione.player-2315.apk",
       "size": 114908795,
       "sha256": "64 lowercase hex",
       "min_sdk": 26,
@@ -72,7 +72,7 @@ and the web installer. Files are chowned `1000:1000` like the site.
     }
   ],
   "revoked": [
-    { "package": "com.miku.settings", "versionCode": 12, "reason": "Broke Wi-Fi settings" }
+    { "package": "com.hione.settings", "versionCode": 12, "reason": "Broke Wi-Fi settings" }
   ]
 }
 ```
@@ -81,11 +81,11 @@ and the web installer. Files are chowned `1000:1000` like the site.
 |---|---|
 | `schema_version` | The app refuses any number above the one it knows (1). |
 | `channel` | Must equal the channel the device asked for, or the manifest is ignored (stops a channel swap). |
-| `build` | The MikuOS build these APKs were built with (`MIKUOS_VERSION`). Informational. |
-| `min_build` | Oldest MikuOS build allowed to take these app updates. A device below it installs none of them and shows "system update needed". |
+| `build` | The HioneOS build these APKs were built with (`HIONEOS_VERSION`). Informational. |
+| `min_build` | Oldest HioneOS build allowed to take these app updates. A device below it installs none of them and shows "system update needed". |
 | `published_at` | UTC, ISO 8601. The device remembers the newest one it accepted per channel and refuses an older manifest (no replay or freeze back to old builds). |
 | `changelog` | Shown on the device as is. `publish.py` refuses emojis and em dashes. |
-| `system_update` | Optional. Shown when `build` is newer than the device's `ro.mikuos.version`. `required` changes the wording to "needed". The link carries `?build=<build>`. |
+| `system_update` | Optional. Shown when `build` is newer than the device's `ro.hioneos.version`. `required` changes the wording to "needed". The link carries `?build=<build>`. |
 | `apks[].url` | Relative to the manifest URL (default), or absolute with `--url-base`. Relative works unchanged on the real host and a LAN test server. |
 | `apks[].size`, `sha256` | Checked after download, before anything else. |
 | `apks[].min_sdk` | From `aapt2 dump badging`. |
@@ -105,7 +105,7 @@ Build versions compare as dot-separated numbers ("0.1.16" < "0.2.0"); anything a
 * Check one by hand:
   ```bash
   base64 -d manifest.json.sig > /tmp/sig.der
-  openssl dgst -sha512 -verify mikuos/ota/keys/ota-signing-primary-p521.pub.pem -signature /tmp/sig.der manifest.json
+  openssl dgst -sha512 -verify hioneos/ota/keys/ota-signing-primary-p521.pub.pem -signature /tmp/sig.der manifest.json
   ```
 
 ## What the device checks, in order
@@ -113,8 +113,8 @@ Build versions compare as dot-separated numbers ("0.1.16" < "0.2.0"); anything a
 1. Fetch `manifest.json` and `.sig`. Verify the signature with an embedded key. Only then parse.
    (A mismatch is retried once after 3 s: an upload swaps the two files one after the other.)
 2. `schema_version` known, `channel` matches, `published_at` not older than the last accepted.
-3. Per APK: package on the allowlist (`com.miku.*`, `com.m500.hardware`, never `com.caf.fmradio`),
-   installed **as a system app in this image** (Miku Update never adds apps), `versionCode` newer
+3. Per APK: package on the allowlist (`com.hione.*`, `com.m500.hardware`, never `com.caf.fmradio`),
+   installed **as a system app in this image** (Hione Update never adds apps), `versionCode` newer
    than installed, `requires_build` / `min_build` / `min_sdk` satisfied, not revoked, not held.
 4. Download to the app cache with resume (`.part` file + `Range: bytes=N-`, `Content-Range`
    checked), size capped at the manifest size.
@@ -125,10 +125,10 @@ Build versions compare as dot-separated numbers ("0.1.16" < "0.2.0"); anything a
 7. The current `/data` copy (if any) is kept for rollback, then a PackageInstaller session commits.
 
 Silent install: the app is `sharedUserId="android.uid.system"` and platform-signed (same pattern as
-`miku-sysbridge`), so it runs in `system_app` (network allowed) and PackageInstaller lets the system
+`hione-sysbridge`), so it runs in `system_app` (network allowed) and PackageInstaller lets the system
 UID commit without user action. If `STATUS_PENDING_USER_ACTION` ever comes back anyway, the
-confirmation screen opens if Miku Update is on screen, otherwise a notification asks for a tap.
-Miku Update installs itself last, because that ends its own process.
+confirmation screen opens if Hione Update is on screen, otherwise a notification asks for a tap.
+Hione Update installs itself last, because that ends its own process.
 
 ## Rollback on the device
 
@@ -137,7 +137,7 @@ Android does not downgrade a `/data` update on a user build (`ro.debuggable=0` h
 * **Back to image version**: uninstall the `/data` update (`PackageInstaller.uninstall`, flags 0,
   which removes the update and restores the system copy). Always available for an updated app.
 * **Back to the previous version** (when the app was already an update before the last one):
-  Miku Update kept that APK in `files/rollback/<pkg>/`. It re-verifies it (stored SHA-256 + signer),
+  Hione Update kept that APK in `files/rollback/<pkg>/`. It re-verifies it (stored SHA-256 + signer),
   uninstalls the update, then installs the kept APK on top of the image copy, which is an upgrade
   as far as Android is concerned.
 
@@ -152,27 +152,27 @@ took the newer one: they will not downgrade. The real options:
 
 1. **Roll forward (preferred).** Revert the code, bump `versionCode` above the bad one, rebuild,
    publish. Every device updates normally.
-2. **Revoke.** `publish.py --revoke com.miku.settings=12:"Broke Wi-Fi settings"`. Devices running
+2. **Revoke.** `publish.py --revoke com.hione.settings=12:"Broke Wi-Fi settings"`. Devices running
    exactly that versionCode as a `/data` update uninstall the update on their next check (back to
    the image copy), hold that version, and post a notification. Revocations carry over to later
    manifests of the channel from the staged copy until `--drop-revocations`. Combine with 1 when the
    fix is ready.
 3. **Stop offering it.** Publish without it (`--exclude PKG`). Devices that already have it keep it.
-4. **Tell users** to open Miku Update > Installed MikuOS apps > Back to image version.
+4. **Tell users** to open Hione Update > Installed HioneOS apps > Back to image version.
 
 ## Keys
 
 The private keys exist **only** in the vault:
 
 ```
-~/.local/bin/ftvault get ft-mikuos-ota ota-signing-primary-p521.pem
-~/.local/bin/ftvault get ft-mikuos-ota ota-signing-backup-p521.pem
+~/.local/bin/ftvault get ft-hioneos-ota ota-signing-primary-p521.pem
+~/.local/bin/ftvault get ft-hioneos-ota ota-signing-backup-p521.pem
 ```
 
 `publish.py` signs with
 
 ```bash
-openssl dgst -sha512 -sign <("$FTVAULT" get ft-mikuos-ota ota-signing-primary-p521.pem) -binary manifest.json
+openssl dgst -sha512 -sign <("$FTVAULT" get ft-hioneos-ota ota-signing-primary-p521.pem) -binary manifest.json
 ```
 
 run through `bash -c`. Process substitution hands openssl a pipe (`/dev/fd/N`): the key is never in a
@@ -183,7 +183,7 @@ in a temp dir and deleted, checks the round trip, checks that the real keys reje
 tampered manifest fails, and writes `manifest.json.sig.DRYRUN` plus an `out/DRY_RUN` marker so the
 result cannot be uploaded.
 
-The app gets the public keys from `mikuos/ota/keys/` at build time (Gradle task `copyOtaKeys`,
+The app gets the public keys from `hioneos/ota/keys/` at build time (Gradle task `copyOtaKeys`,
 exact file names only, and it refuses a file that is not a public-key PEM).
 
 ### Rotation
@@ -194,24 +194,24 @@ Normal state: sign with primary, backup unused but trusted by every device.
   1. Sign with the backup now: `publish.py ... --key backup`. Devices already accept it.
   2. Make a new key straight into the vault, never on disk:
      ```bash
-     openssl ecparam -name secp521r1 -genkey -noout | ftvault set ft-mikuos-ota ota-signing-next-p521.pem
-     openssl ec -pubout -in <(ftvault get ft-mikuos-ota ota-signing-next-p521.pem) > /tmp/next.pub.pem
+     openssl ecparam -name secp521r1 -genkey -noout | ftvault set ft-hioneos-ota ota-signing-next-p521.pem
+     openssl ec -pubout -in <(ftvault get ft-hioneos-ota ota-signing-next-p521.pem) > /tmp/next.pub.pem
      ```
-  3. In `mikuos/ota/keys/`: the old backup's public key becomes `ota-signing-primary-p521.pub.pem`,
+  3. In `hioneos/ota/keys/`: the old backup's public key becomes `ota-signing-primary-p521.pub.pem`,
      the new one becomes `ota-signing-backup-p521.pub.pem`. In the vault, move the entries the same
      way, pipe to pipe:
      ```bash
-     ftvault get ft-mikuos-ota ota-signing-backup-p521.pem | ftvault set ft-mikuos-ota ota-signing-primary-p521.pem
-     ftvault get ft-mikuos-ota ota-signing-next-p521.pem   | ftvault set ft-mikuos-ota ota-signing-backup-p521.pem
+     ftvault get ft-hioneos-ota ota-signing-backup-p521.pem | ftvault set ft-hioneos-ota ota-signing-primary-p521.pem
+     ftvault get ft-hioneos-ota ota-signing-next-p521.pem   | ftvault set ft-hioneos-ota ota-signing-backup-p521.pem
      ```
      `publish.py` refuses to publish if a vault entry does not match its public key file, so a
-     half-done swap cannot sign anything. Rebuild Miku Update with a higher
+     half-done swap cannot sign anything. Rebuild Hione Update with a higher
      versionCode and publish it, signed with the (old) backup key, which is now the primary.
-  4. Once devices run the new Miku Update, the old primary is no longer trusted anywhere that
+  4. Once devices run the new Hione Update, the old primary is no longer trusted anywhere that
      updated. Devices that never update keep trusting it, so after a leak also consider revoking
      anything signed in the gap.
 * **Both keys lost:** devices cannot be told anything new over the air. Ship new keys in a full
-  image (rebuild Miku Update, reflash with the web installer).
+  image (rebuild Hione Update, reflash with the web installer).
 
 ## Publishing
 
@@ -222,17 +222,17 @@ cd ~/Documents/GitHub/m500
 $EDITOR /tmp/notes.txt                       # plain text, no emojis, no em dashes
 
 # 1. dry run: shows what goes in, signs with a throwaway key, touches no vault and no server
-mikuos/ota/publish.py --channel dev --changelog /tmp/notes.txt --dry-run
+hioneos/ota/publish.py --channel dev --changelog /tmp/notes.txt --dry-run
 
-# 2. real signature, staged in mikuos/ota/out (test it on the LAN, see below)
-mikuos/ota/publish.py --channel dev --changelog /tmp/notes.txt
+# 2. real signature, staged in hioneos/ota/out (test it on the LAN, see below)
+hioneos/ota/publish.py --channel dev --changelog /tmp/notes.txt
 
 # 3. real signature and upload
-mikuos/ota/publish.py --channel stable --changelog /tmp/notes.txt --upload
+hioneos/ota/publish.py --channel stable --changelog /tmp/notes.txt --upload
 ```
 
-What it does: scans `miku-player-kotlin/*/build/outputs/apk/release/*.apk`, reads each with
-`aapt2 dump badging`, keeps MikuOS packages only (skips the FM app and anything unsigned), takes the
+What it does: scans `hione-player-kotlin/*/build/outputs/apk/release/*.apk`, reads each with
+`aapt2 dump badging`, keeps HioneOS packages only (skips the FM app and anything unsigned), takes the
 highest versionCode per package, requires every APK to have one signer and all of them the same
 certificate (`--expect-signer SHA256` pins it), copies them into `out/ota/apks/...` (refuses if
 that versionCode is already staged with different bytes), writes the manifest, signs, verifies.
@@ -241,7 +241,7 @@ Useful options:
 
 | Option | |
 |---|---|
-| `--build`, `--min-build` | default: `MIKUOS_VERSION` from `build_mikuos_super.sh`, and `min_build` = `build`. Lower `--min-build` only when the APKs really run on older images. |
+| `--build`, `--min-build` | default: `HIONEOS_VERSION` from `build_hioneos_super.sh`, and `min_build` = `build`. Lower `--min-build` only when the APKs really run on older images. |
 | `--only PKG`, `--exclude PKG`, `--apk PATH`, `--no-scan` | choose what goes in |
 | `--requires-build PKG=BUILD` | per-APK minimum build |
 | `--system-update-build 0.2.0 [--system-update-required] [--system-update-notes FILE]` | announce a full image |
@@ -296,18 +296,18 @@ obfuscation) for `/ota/`: the signature covers the exact bytes.
 ## Testing on the LAN before the real host
 
 ```bash
-mikuos/ota/publish.py --channel dev --changelog /tmp/notes.txt     # real signature, staged only
-mikuos/ota/serve_local.py --throttle 300                            # prints http://<pc-ip>:8000/ota/
+hioneos/ota/publish.py --channel dev --changelog /tmp/notes.txt     # real signature, staged only
+hioneos/ota/serve_local.py --throttle 300                            # prints http://<pc-ip>:8000/ota/
 ```
 
-On the device: Miku Update > About > Test server, enter the printed URL, Use this server, pick the
+On the device: Hione Update > About > Test server, enter the printed URL, Use this server, pick the
 dev channel. The manifest still has to carry a real signature. Changing the server resets the
 "never go backwards" timestamps, since a different server has its own history. `--throttle` (KB/s)
 makes progress visible and leaves time to kill Wi-Fi mid-download to test resume.
 
-## Adding Miku Update to the image
+## Adding Hione Update to the image
 
-`mikuos/build/build_mikuos_super.sh` must build `:mikuos-update` and inject
-`MikuUpdate.apk` into `system/app/MikuUpdate/` (not priv-app: as the system UID with the platform
+`hioneos/build/build_hioneos_super.sh` must build `:hioneos-update` and inject
+`HioneUpdate.apk` into `system/app/HioneUpdate/` (not priv-app: as the system UID with the platform
 signature it already holds INSTALL_PACKAGES and DELETE_PACKAGES, and priv-app would only add a
 privapp-permissions allowlist to keep in step with `ro.control_privapp_permissions=enforce`).

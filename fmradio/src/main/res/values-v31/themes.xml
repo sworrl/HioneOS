@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Android 12+ launch splash: the app icon on the app's dark background. -->
-    <style name="Theme.MikuFM" parent="android:Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:windowBackground">#0B1418</item>
-        <item name="android:windowSplashScreenBackground">#0B1418</item>
+    <style name="Theme.HioneFM" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">#111216</item>
+        <item name="android:windowSplashScreenBackground">#111216</item>
         <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
     </style>
 </resources>

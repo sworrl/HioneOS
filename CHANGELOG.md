@@ -1,10 +1,20 @@
-# MikuOS and Miku Music changelog
+# HioneOS and Hione Hits changelog
 
-MikuOS for the HiBy M500 x Hatsune Miku, and Miku Music, its native Kotlin/Compose player
-(`com.miku.player`). Newest first. The README's What is verified table is the line between what
+HioneOS for the HiBy Digital M500, and Hione Hits, its native Kotlin/Compose player
+(`com.hione.player`). Newest first. The README's What is verified table is the line between what
 has been checked on the device and what has not.
 
-## Pending flash: MikuOS 0.4.0
+## HioneOS 0.4.6 (2026-10-14)
+
+HioneOS 0.4.6, Hione Hits 2.2.1, Hione Launcher 0.3.1, Hardware Settings 1.2.1, Hione Settings 0.3.1, Hione Update 0.4.1, Hione Cast TV 0.2.1.
+
+- **Namespace migration and self-healing recovery**: Completed the `com.hione.*` package transition with automatic recovery of liked songs (192 tracks verified on device), cumulative heart counts, play history, and play counts from `ListenStatsDb` and migration backups.
+- **Multi-lane BPM note highway**: Rebuilt the vertical rhythm highway with phase-locked note spawning, deterministic lane assignment (`1x` to `10x`), per-lane fret validation, 2-thumb Power Chords, and hit consumption bursts.
+- **Non-blocking unlock celebrations**: Replaced full-screen modal scrims during gameplay with a top banner that ignores accidental rhythm taps for 900 ms and auto-advances.
+- **DankPods unlocks**: Added the emerald-and-gold PKCELL AA battery icon (`DANKPODS_PKCELL`), playable Frank the Snake arcade game (`HioneFrankSnakeActivity`), and 1-Grit concrete rock screen-breaker animation (`DANKPODS_ONE_GRIT`).
+- **Enlarged system typography**: Increased font sizes across Hardware Settings, Blackjack Monitor, DAC filter response cards, HioneOS Settings, Playback Settings, and Hione Update for legibility on the 3.2-inch M500 display.
+
+## MikuOS 0.4.0 (2026-10-10)
 
 MikuOS 0.4.0, Miku Music 2.3.0, Miku Update 0.4.0.
 

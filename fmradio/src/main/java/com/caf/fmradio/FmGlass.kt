@@ -49,8 +49,8 @@ import androidx.compose.ui.unit.dp
  */
 fun Modifier.glass(
     shape: Shape,
-    accent: Color = MikuTeal,
-    accent2: Color = MikuPink,
+    accent: Color = HioneTeal,
+    accent2: Color = HionePink,
     fill: Color = Color(0xB80A1E26),
     rimAlpha: Float = 0.55f,
     rimWidth: Dp = 1.dp,

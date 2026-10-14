@@ -24,7 +24,7 @@ static bool writeSysfs(const char* path, const char* value) {
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetDigitalFilter(JNIEnv* env, jclass clazz, jint filter) {
+Java_com_hione_player_M500AudioHal_nativeSetDigitalFilter(JNIEnv* env, jclass clazz, jint filter) {
     char buf[16];
     snprintf(buf, sizeof(buf), "%d", filter);
     bool ok = writeSysfs("/sys/devices/platform/sa_sound_setting/digital_filter", buf);
@@ -33,7 +33,7 @@ Java_com_miku_player_M500AudioHal_nativeSetDigitalFilter(JNIEnv* env, jclass cla
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetHighPower(JNIEnv* env, jclass clazz, jboolean highPower) {
+Java_com_hione_player_M500AudioHal_nativeSetHighPower(JNIEnv* env, jclass clazz, jboolean highPower) {
     const char* val = highPower ? "1" : "0";
     bool ok = writeSysfs("/sys/devices/platform/sa_sound_setting/high_power_mode", val);
     LOGI("Set High Power Gain (+6dB): %d (res=%d)", highPower, ok);
@@ -41,7 +41,7 @@ Java_com_miku_player_M500AudioHal_nativeSetHighPower(JNIEnv* env, jclass clazz, 
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetDreMode(JNIEnv* env, jclass clazz, jboolean dre) {
+Java_com_hione_player_M500AudioHal_nativeSetDreMode(JNIEnv* env, jclass clazz, jboolean dre) {
     const char* val = dre ? "1" : "0";
     bool ok = writeSysfs("/sys/devices/platform/sa_sound_setting/dre_mode", val);
     LOGI("Set DRE Mode (130dB+ SNR): %d (res=%d)", dre, ok);
@@ -49,7 +49,7 @@ Java_com_miku_player_M500AudioHal_nativeSetDreMode(JNIEnv* env, jclass clazz, jb
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetPocketLock(JNIEnv* env, jclass clazz, jboolean touchLock, jboolean keyLock, jboolean allowVol) {
+Java_com_hione_player_M500AudioHal_nativeSetPocketLock(JNIEnv* env, jclass clazz, jboolean touchLock, jboolean keyLock, jboolean allowVol) {
     bool ok1 = writeSysfs("/sys/devices/platform/soc/4a88000.i2c/i2c-1/1-005a/hyn_gesture_mode", touchLock ? "1" : "0");
     const char* keyVal = keyLock ? (allowVol ? "sw_user" : "all") : "none";
     bool ok2 = writeSysfs("/sys/devices/platform/soc/soc:gpio_keys_hiby/disabled_keys", keyVal);
@@ -59,7 +59,7 @@ Java_com_miku_player_M500AudioHal_nativeSetPocketLock(JNIEnv* env, jclass clazz,
 
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetOutput(JNIEnv* env, jclass clazz, jstring output) {
+Java_com_hione_player_M500AudioHal_nativeSetOutput(JNIEnv* env, jclass clazz, jstring output) {
     const char* str = env->GetStringUTFChars(output, nullptr);
     bool ok = writeSysfs("/sys/devices/platform/soc/soc:hiby,sound-plat/output", str);
     env->ReleaseStringUTFChars(output, str);
@@ -67,7 +67,7 @@ Java_com_miku_player_M500AudioHal_nativeSetOutput(JNIEnv* env, jclass clazz, jst
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_miku_player_M500AudioHal_nativeSetVolume(JNIEnv* env, jclass clazz, jint volume) {
+Java_com_hione_player_M500AudioHal_nativeSetVolume(JNIEnv* env, jclass clazz, jint volume) {
     char buf[64];
     snprintf(buf, sizeof(buf), "headset double %d", volume);
     bool ok = writeSysfs("/sys/devices/platform/soc/soc:hiby,sound-plat/volume", buf);

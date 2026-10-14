@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Black window background so nothing white flashes before Compose draws its first frame. -->
+    <style name="Theme.HioneMedia" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/hione_bg</item>
+        <item name="android:colorAccent">@color/hione_teal</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.HioneMedia.Viewer">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <style name="Theme.HioneMedia.Camera">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+    <style name="Theme.HioneMedia.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+    </style>
+</resources>

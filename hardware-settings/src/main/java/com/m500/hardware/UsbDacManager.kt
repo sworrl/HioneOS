@@ -63,22 +63,22 @@ object UsbDacManager {
      * as a USB sound card and plays what it is sent.
      *
      * The sequence is HiBy's, and it needs property writes only the system_app domain is allowed
-     * (vendor.usb.*, sys.usb.config). This used to send it through `su`, which MikuOS does not
-     * have, so the toggle never did anything. It now asks com.miku.sysbridge, the one MikuOS
+     * (vendor.usb.*, sys.usb.config). This used to send it through `su`, which HioneOS does not
+     * have, so the toggle never did anything. It now asks com.hione.sysbridge, the one HioneOS
      * package running as the system UID, to do the writes. The real state is still read back from
      * sys.usb.state by [isActive], never from the preference.
      */
     suspend fun setUsbDacMode(ctx: Context, enable: Boolean) = withContext(Dispatchers.IO) {
         val sp = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         sp.edit().putBoolean(KEY_DAC_MODE, enable).apply()
-        val i = android.content.Intent("com.miku.sysbridge.USB_DAC")
-            .setPackage("com.miku.sysbridge")
+        val i = android.content.Intent("com.hione.sysbridge.USB_DAC")
+            .setPackage("com.hione.sysbridge")
             .putExtra("enable", enable)
             .putExtra("rate", getSampleRate(ctx))
             .putExtra("bits", getBitDepth(ctx))
-        runCatching { ctx.sendBroadcast(i, "com.miku.permission.SYSTEM_BRIDGE") }
+        runCatching { ctx.sendBroadcast(i, "com.hione.permission.SYSTEM_BRIDGE") }
             .onFailure { Log.e(TAG, "system bridge not reachable", it) }
-        Log.i(TAG, "USB DAC mode ${if (enable) "requested on" else "requested off"} via com.miku.sysbridge")
+        Log.i(TAG, "USB DAC mode ${if (enable) "requested on" else "requested off"} via com.hione.sysbridge")
     }
 
     suspend fun configureParams(ctx: Context, sampleRate: Int, bitDepth: Int) = withContext(Dispatchers.IO) {

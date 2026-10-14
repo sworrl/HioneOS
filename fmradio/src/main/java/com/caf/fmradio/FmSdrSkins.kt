@@ -19,7 +19,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
- * The shapes a receiver panel can take, in the Miku palette.
+ * The shapes a receiver panel can take, in the Hione palette.
  *
  * These are the conventions real SDR software settled on, and they are conventions rather than
  * decoration: each one answers a different question. The point of offering all of them is that

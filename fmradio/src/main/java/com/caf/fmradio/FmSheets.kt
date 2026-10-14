@@ -55,7 +55,7 @@ fun FmSheetFrame(
         Column(
             Modifier.fillMaxWidth()
                 .heightIn(max = maxHeight)
-                .glass(shape, accent = MikuCyan, accent2 = MikuPink, fill = Color(0xF5061219), rimAlpha = 0.7f)
+                .glass(shape, accent = HioneCyan, accent2 = HionePink, fill = Color(0xF5061219), rimAlpha = 0.7f)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -65,7 +65,7 @@ fun FmSheetFrame(
         ) {
             Box(
                 Modifier.align(Alignment.CenterHorizontally).width(44.dp).height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)).background(MikuCyan.copy(alpha = 0.5f))
+                    .clip(RoundedCornerShape(2.dp)).background(HioneCyan.copy(alpha = 0.5f))
             )
             Spacer(Modifier.height(10.dp))
             content()
@@ -77,7 +77,7 @@ fun FmSheetFrame(
 @Composable
 private fun SheetTitle(text: String) {
     Text(
-        text.uppercase(Locale.US), color = MikuCyan, fontSize = 11.sp,
+        text.uppercase(Locale.US), color = HioneCyan, fontSize = 11.sp,
         fontWeight = FontWeight.Bold, fontFamily = AudiowideFont, letterSpacing = 1.sp
     )
     Spacer(Modifier.height(6.dp))
@@ -85,7 +85,7 @@ private fun SheetTitle(text: String) {
 
 @Composable
 private fun SheetNote(text: String) {
-    Text(text, color = MikuTextSecondary, fontSize = 8.sp, lineHeight = 11.sp)
+    Text(text, color = HioneTextSecondary, fontSize = 8.sp, lineHeight = 11.sp)
 }
 
 // ---------------------------------------------------------------------------- scan results
@@ -117,12 +117,12 @@ fun ColumnScope.FmScanResults(st: FmState, onTuned: () -> Unit) {
             ) {
                 Text(
                     String.format(Locale.US, "%.1f", hit.freqKHz / 1000.0),
-                    color = if (current) MikuCyan else Color.White,
+                    color = if (current) HioneCyan else Color.White,
                     fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                     modifier = Modifier.width(64.dp)
                 )
                 Column(Modifier.weight(1f)) {
-                    Text(stn?.call ?: "not in the catalog here", color = if (stn != null) color else MikuTextSecondary,
+                    Text(stn?.label ?: "not in the catalog here", color = if (stn != null) color else HioneTextSecondary,
                          fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
                     Text(
                         buildString {
@@ -130,7 +130,7 @@ fun ColumnScope.FmScanResults(st: FmState, onTuned: () -> Unit) {
                             hit.snr?.let { append("   SNR ").append(it) }
                             stn?.genre?.let { append("   ").append(it) }
                         },
-                        color = MikuTextSecondary, fontSize = 8.sp, fontFamily = AudiowideFont
+                        color = HioneTextSecondary, fontSize = 8.sp, fontFamily = AudiowideFont
                     )
                 }
                 Box(
@@ -139,7 +139,7 @@ fun ColumnScope.FmScanResults(st: FmState, onTuned: () -> Unit) {
                 ) {
                     Icon(
                         if (fav) Icons.Default.Star else Icons.Default.StarBorder, "Preset",
-                        tint = if (fav) MikuNeonPink else Color.Gray, modifier = Modifier.size(20.dp)
+                        tint = if (fav) HioneNeonPink else Color.Gray, modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -153,19 +153,37 @@ fun ColumnScope.FmScanResults(st: FmState, onTuned: () -> Unit) {
 fun FmSettings(st: FmState) {
     SheetTitle("Tuner settings")
     Column(Modifier.verticalScroll(rememberScrollState())) {
-        Text("REGION", color = MikuTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+        Text("REGION", color = HioneTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
         Spacer(Modifier.height(4.dp))
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+                .background(if (st.bandAuto) HioneCyan.copy(alpha = 0.2f) else Color.Transparent)
+                .clickable { FmRadioManager.setBandAuto() }
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Automatic", color = if (st.bandAuto) HioneCyan else Color.White,
+                fontSize = 10.sp, fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                if (st.bandAuto) st.band.label + (st.bandAutoReason?.let { " · $it" } ?: "")
+                else "Japan or North America, from where you are",
+                color = HioneTextSecondary, fontSize = 8.sp
+            )
+        }
         FmBandPlan.entries.forEach { plan ->
-            val sel = plan == st.band
+            val sel = plan == st.band && !st.bandAuto
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
-                    .background(if (sel) MikuCyan.copy(alpha = 0.2f) else Color.Transparent)
+                    .background(if (sel) HioneCyan.copy(alpha = 0.2f) else Color.Transparent)
                     .clickable { FmRadioManager.setBand(plan) }
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    plan.label, color = if (sel) MikuCyan else Color.White,
+                    plan.label, color = if (sel) HioneCyan else Color.White,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.weight(1f))
@@ -173,7 +191,7 @@ fun FmSettings(st: FmState) {
                     "%.1f–%.1f MHz · %d kHz · %d µs".format(
                         plan.lowKHz / 1000.0, plan.highKHz / 1000.0, plan.stepKHz, plan.emphasisUs
                     ),
-                    color = MikuTextSecondary, fontSize = 8.sp
+                    color = HioneTextSecondary, fontSize = 8.sp
                 )
             }
         }
@@ -181,25 +199,28 @@ fun FmSettings(st: FmState) {
         SheetNote(
             "The region sets the band limits, channel spacing, de-emphasis and RDS standard, " +
                 "all of which the chip only reads when it is enabled. Changing it therefore " +
-                "power-cycles the tuner."
+                "power-cycles the tuner. Automatic picks Japan (76.0-95.0 MHz, 100 kHz) when the " +
+                "nearest stations in the catalog are Japanese, and North America when they are " +
+                "US, Canadian or Mexican. Before the device knows where it is, it goes by the " +
+                "SIM country, or a Japanese locale together with the Tokyo time zone."
         )
 
         Spacer(Modifier.height(12.dp))
-        Text("CHANNEL GRID", color = MikuTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+        Text("CHANNEL GRID", color = HioneTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
         Spacer(Modifier.height(4.dp))
         FmChannelGrid.entries.forEach { g ->
             val sel = g == st.channelGrid
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
-                    .background(if (sel) MikuCyan.copy(alpha = 0.2f) else Color.Transparent)
+                    .background(if (sel) HioneCyan.copy(alpha = 0.2f) else Color.Transparent)
                     .clickable { FmRadioManager.setChannelGrid(g) }
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(g.label, color = if (sel) MikuCyan else Color.White,
+                Text(g.label, color = if (sel) HioneCyan else Color.White,
                      fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
-                Text(g.detail, color = MikuTextSecondary, fontSize = 7.5.sp)
+                Text(g.detail, color = HioneTextSecondary, fontSize = 7.5.sp)
             }
         }
         Spacer(Modifier.height(3.dp))
@@ -210,21 +231,21 @@ fun FmSettings(st: FmState) {
         )
 
         Spacer(Modifier.height(12.dp))
-        Text("SEEK SENSITIVITY", color = MikuTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+        Text("SEEK SENSITIVITY", color = HioneTextSecondary, fontSize = 7.5.sp, fontFamily = AudiowideFont)
         Spacer(Modifier.height(4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             QualcommFmHardwareEngine.SENSITIVITY_LABELS.forEachIndexed { i, label ->
                 val sel = i == st.seekSensitivity
                 Box(
                     Modifier.weight(1f).clip(RoundedCornerShape(8.dp))
-                        .background(if (sel) MikuCyan else Color(0x2200E5FF))
-                        .border(1.dp, if (sel) MikuCyan else CyberGlassBorder, RoundedCornerShape(8.dp))
+                        .background(if (sel) HioneCyan else Color(0x22FFC56B))
+                        .border(1.dp, if (sel) HioneCyan else CyberGlassBorder, RoundedCornerShape(8.dp))
                         .clickable { FmRadioManager.setSeekSensitivity(i) }
                         .padding(vertical = 6.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        label, color = if (sel) Color.Black else MikuTextSecondary,
+                        label, color = if (sel) Color.Black else HioneTextSecondary,
                         fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont
                     )
                 }
@@ -263,15 +284,15 @@ private fun SettingSwitch(title: String, detail: String, checked: Boolean, onCha
     Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f).padding(end = 10.dp)) {
             Text(title, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            Text(detail, color = MikuTextSecondary, fontSize = 7.5.sp, lineHeight = 10.sp)
+            Text(detail, color = HioneTextSecondary, fontSize = 7.5.sp, lineHeight = 10.sp)
         }
         Switch(
             checked = checked, onCheckedChange = onChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.Black,
-                checkedTrackColor = MikuCyan,
-                uncheckedThumbColor = MikuTextSecondary,
-                uncheckedTrackColor = Color(0x2200E5FF),
+                checkedTrackColor = HioneCyan,
+                uncheckedThumbColor = HioneTextSecondary,
+                uncheckedTrackColor = Color(0x22FFC56B),
             )
         )
     }
@@ -333,7 +354,7 @@ fun FmDiagnosticsPanel(st: FmState) {
         if (st.siphonState == QualcommFmHardwareEngine.SiphonState.FAILED) {
             Text(
                 "RETRY SIPHON",
-                color = MikuTeal, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                color = HioneTeal, fontSize = 10.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { FmRadioManager.retrySiphon() }.padding(vertical = 6.dp)
             )
         }
@@ -343,8 +364,8 @@ fun FmDiagnosticsPanel(st: FmState) {
             ?: st.programmeType?.toString() ?: "—")
         st.hardwareError?.let {
             Spacer(Modifier.height(8.dp))
-            Text("LAST ERROR", color = MikuNeonPink, fontSize = 7.5.sp, fontFamily = AudiowideFont)
-            Text(it, color = MikuNeonPink, fontSize = 8.sp, lineHeight = 11.sp)
+            Text("LAST ERROR", color = HioneNeonPink, fontSize = 7.5.sp, fontFamily = AudiowideFont)
+            Text(it, color = HioneNeonPink, fontSize = 8.sp, lineHeight = 11.sp)
         }
     }
 }
@@ -352,7 +373,7 @@ fun FmDiagnosticsPanel(st: FmState) {
 @Composable
 private fun DiagRow(label: String, value: String) {
     Row(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-        Text(label, color = MikuTextSecondary, fontSize = 8.5.sp, modifier = Modifier.width(132.dp))
+        Text(label, color = HioneTextSecondary, fontSize = 8.5.sp, modifier = Modifier.width(132.dp))
         Text(value, color = Color.White, fontSize = 8.5.sp, fontWeight = FontWeight.Bold)
     }
 }
@@ -393,11 +414,11 @@ fun ColumnScope.FmKeypad(st: FmState, onTuned: () -> Unit) {
     )
     Text(
         String.format(Locale.US, "%.1f to %.1f MHz in %d kHz steps. Anything from 64.0 to 108.0 tunes.", low, high, st.band.stepKHz),
-        color = MikuTextSecondary, fontSize = 8.sp,
+        color = HioneTextSecondary, fontSize = 8.sp,
         modifier = Modifier.align(Alignment.CenterHorizontally)
     )
     note?.let {
-        Text(it, color = MikuNeonPink, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp))
+        Text(it, color = HioneNeonPink, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp))
     }
     Spacer(Modifier.height(8.dp))
 
@@ -408,7 +429,7 @@ fun ColumnScope.FmKeypad(st: FmState, onTuned: () -> Unit) {
                 row.forEach { k ->
                     Box(
                         Modifier.weight(1f)
-                            .glass(RoundedCornerShape(12.dp), accent = MikuCyan, rimAlpha = 0.4f, shine = 0.8f)
+                            .glass(RoundedCornerShape(12.dp), accent = HioneCyan, rimAlpha = 0.4f, shine = 0.8f)
                             .pressable {
                                 entry = when {
                                     k == "⌫" -> entry.dropLast(1)
@@ -420,7 +441,7 @@ fun ColumnScope.FmKeypad(st: FmState, onTuned: () -> Unit) {
                             .padding(vertical = 14.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(k, color = MikuCyan, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+                        Text(k, color = HioneCyan, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                             fontFamily = AudiowideFont)
                     }
                 }
@@ -428,7 +449,7 @@ fun ColumnScope.FmKeypad(st: FmState, onTuned: () -> Unit) {
         }
         Box(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                .background(MikuCyan).pressable { commit() }.padding(vertical = 14.dp),
+                .background(HioneCyan).pressable { commit() }.padding(vertical = 14.dp),
             contentAlignment = Alignment.Center
         ) {
             Text("TUNE", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Black,

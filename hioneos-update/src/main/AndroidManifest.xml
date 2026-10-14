@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Hione Update. Installs newer builds of HioneOS's own system apps over the image copies, as /data
+  updates, and installs full system images on the device through update_engine (A/B) when the
+  image trusts the HioneOS payload keys, or points to the web installer when it does not.
+
+  Runs as the system UID, the same pattern as hione-sysbridge: sharedUserId android.uid.system,
+  platform-signed. That puts it in the system_app SELinux domain (network allowed) and makes
+  PackageInstaller treat it as a system installer, so updates commit without a confirmation
+  dialog. Ships in /system/app, so no privapp-permissions entry is needed: every permission below
+  is granted to the system UID and to platform-signed packages without the priv-app allowlist.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:sharedUserId="android.uid.system"
+    tools:ignore="SharedUserId">
+
+    <!-- Mascot packs (Mascot.kt). Every HioneOS app declares the same signature permission, so it
+         exists whichever app is installed first. Hione Update's pack provider requires it. -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.DELETE_PACKAGES" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- "Restart to finish" after update_engine wrote the other slot. Signature|privileged:
+         granted to this platform-signed system UID app. -->
+    <uses-permission android:name="android.permission.REBOOT" />
+
+    <application
+        android:name=".HioneUpdateApp"
+        android:label="Hione Update"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/Theme.HioneUpdate">
+
+        <!-- Starts Mascot (the active mascot pack) at process start. -->
+        <provider
+            android:name="com.hione.update.MascotInit"
+            android:authorities="${applicationId}.mascot-init"
+            android:exported="false"
+            android:initOrder="1000" />
+
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.HioneUpdate">
+            <intent-filter>
+                <action android:name="com.hione.update.action.OPEN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+        <!-- Home-screen entries, one per mascot label set. Mascot.syncAliases enables the one the
+             active pack names and disables the others. The activity itself keeps no LAUNCHER
+             filter, so explicit launches by class name keep working whatever the pack. -->
+        <activity-alias
+            android:name=".ui.MainActivityHione"
+            android:targetActivity=".ui.MainActivity"
+            android:exported="true"
+            android:enabled="true"
+            android:label="Hione Update"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivityHits"
+            android:targetActivity=".ui.MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:label="Hione Update"
+            android:icon="@mipmap/ic_launcher_hione"
+            android:roundIcon="@mipmap/ic_launcher_hione_round">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivityPlain"
+            android:targetActivity=".ui.MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:label="Updates"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Mascot packs for every HioneOS app: built-in ones from assets/mascot, downloaded ones
+             from this app's private storage. Read only, platform-signed callers only. -->
+        <provider
+            android:name=".mascot.MascotPackProvider"
+            android:authorities="com.hione.update.mascot"
+            android:exported="true"
+            android:readPermission="com.hione.permission.MASCOT_PACKS"
+            android:writePermission="android.permission.INSTALL_PACKAGES"
+            android:grantUriPermissions="false" />
+
+        <!-- PackageInstaller session and uninstall results come back here through our own
+             PendingIntents, so it does not need to be exported. -->
+        <receiver
+            android:name=".ota.InstallResultReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".work.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

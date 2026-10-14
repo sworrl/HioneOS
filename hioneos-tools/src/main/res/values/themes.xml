@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hione_bg">#FF0B0C0E</color>
+
+    <style name="Theme.HioneTools" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/hione_bg</item>
+        <item name="android:colorBackground">@color/hione_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:colorAccent">#FFFFAB2E</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Ring screen: no starting-window animation so a 7 am wake shows the buttons at once. -->
+    <style name="Theme.HioneTools.Ring" parent="Theme.HioneTools">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">false</item>
+    </style>
+</resources>

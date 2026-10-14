@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
  * stronger and the eye can rank two streaks without consulting a legend. Any replacement has
  * to keep that property or it stops being an instrument and becomes wallpaper.
  *
- * So this is Miku's palette arranged to satisfy the same constraint. Near-black navy for the
+ * So this is Hione's palette arranged to satisfy the same constraint. Near-black navy for the
  * noise floor, through her teal, into cyan, and finally into her pink at the top of the scale
  * where the classic ramp would go white. Brightness rises the whole way; the hue shift is what
  * makes it hers.
@@ -25,9 +25,9 @@ object FmWaterfallPalette {
         0.00f to Color(0xFF04080E),   // noise floor, navy-black
         0.18f to Color(0xFF07202C),   // deep water
         0.36f to Color(0xFF0E5A66),   // dark teal
-        0.54f to Color(0xFF39C5BB),   // Miku teal
-        0.72f to Color(0xFF00E5FF),   // cyan
-        0.88f to Color(0xFFFF5FA2),   // Miku pink, where the classic ramp goes white
+        0.54f to Color(0xFFFFAB2E),   // Hione teal
+        0.72f to Color(0xFFFFC56B),   // cyan
+        0.88f to Color(0xFF8EC5FF),   // Hione pink, where the classic ramp goes white
         1.00f to Color(0xFFFFD9EC),   // hot
     )
 

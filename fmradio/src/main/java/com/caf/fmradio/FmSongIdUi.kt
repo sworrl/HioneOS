@@ -132,7 +132,7 @@ fun SongIdButton(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifie
         modifier
             .height(46.dp)
             .glass(
-                RoundedCornerShape(23.dp), accent = MikuPink, accent2 = MikuTeal,
+                RoundedCornerShape(23.dp), accent = HionePink, accent2 = HioneTeal,
                 fill = if (busy) Color(0xD0301030) else Color(0xC0200E22),
                 rimAlpha = if (busy) 1f else 0.75f, shine = if (busy) 1.4f else 1f,
             )
@@ -145,7 +145,7 @@ fun SongIdButton(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifie
             when (state.phase) {
                 FmSongId.Phase.LISTENING -> ProgressRing((state.bufferedSeconds / SONG_MIN_SECONDS.toFloat()).coerceIn(0f, 1f))
                 FmSongId.Phase.MATCHING -> Spinner()
-                else -> Icon(Icons.Default.GraphicEq, null, tint = MikuPink, modifier = Modifier.size(20.dp))
+                else -> Icon(Icons.Default.GraphicEq, null, tint = HionePink, modifier = Modifier.size(20.dp))
             }
         }
         Spacer(Modifier.width(6.dp))
@@ -168,7 +168,7 @@ private fun ProgressRing(frac: Float) {
         val d = size.minDimension - sw
         val tl = Offset(sw / 2, sw / 2)
         drawArc(Color.White.copy(alpha = 0.15f), 0f, 360f, false, tl, Size(d, d), style = Stroke(sw))
-        drawArc(MikuPink, -90f, 360f * frac, false, tl, Size(d, d), style = Stroke(sw, cap = StrokeCap.Round))
+        drawArc(HionePink, -90f, 360f * frac, false, tl, Size(d, d), style = Stroke(sw, cap = StrokeCap.Round))
     }
 }
 
@@ -181,7 +181,7 @@ private fun Spinner() {
         val sw = 2.5.dp.toPx()
         val d = size.minDimension - sw
         drawArc(
-            Brush.sweepGradient(listOf(Color.Transparent, MikuTeal, MikuPink)),
+            Brush.sweepGradient(listOf(Color.Transparent, HioneTeal, HionePink)),
             0f, 300f, false, Offset(sw / 2, sw / 2), Size(d, d), style = Stroke(sw, cap = StrokeCap.Round)
         )
     }
@@ -200,7 +200,7 @@ fun SongIdCard(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifier 
     Box(
         modifier
             .fillMaxWidth()
-            .glass(RoundedCornerShape(14.dp), accent = MikuPink, accent2 = MikuTeal,
+            .glass(RoundedCornerShape(14.dp), accent = HionePink, accent2 = HioneTeal,
                    fill = Color(0xEE07141B), rimAlpha = 0.9f)
             .padding(8.dp)
     ) {
@@ -209,18 +209,18 @@ fun SongIdCard(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifier 
                 Text(
                     if (state.phase == FmSongId.Phase.LISTENING) "LISTENING · ${state.bufferedSeconds} s OF AUDIO"
                     else "MATCHING ${state.bufferedSeconds} s AGAINST THE CATALOG…",
-                    color = MikuPink, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
+                    color = HionePink, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                 )
                 Spacer(Modifier.height(6.dp))
                 if (state.phase == FmSongId.Phase.LISTENING) {
                     LinearProgressIndicator(
                         progress = { (state.bufferedSeconds / SONG_MIN_SECONDS.toFloat()).coerceIn(0f, 1f) },
-                        color = MikuPink, trackColor = Color(0x33FF5FA2),
+                        color = HionePink, trackColor = Color(0x338EC5FF),
                         modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
                     )
                 } else {
                     LinearProgressIndicator(
-                        color = MikuTeal, trackColor = Color(0x3339C5BB),
+                        color = HioneTeal, trackColor = Color(0x33FFAB2E),
                         modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
                     )
                 }
@@ -232,16 +232,16 @@ fun SongIdCard(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifier 
                     Column(Modifier.weight(1f)) {
                         Text(m.title, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                              maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(m.artist, color = MikuTealBright, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(m.artist, color = HioneTealBright, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(
                             listOfNotNull(m.album, "${fmtMhz(m.freqKHz)} MHz").joinToString(" · "),
-                            color = MikuTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            color = HioneTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                         )
                         Spacer(Modifier.height(4.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                             LikeButton(m, compact = true)
-                            CardAction("OPEN", Icons.AutoMirrored.Filled.OpenInNew, MikuPink) { openSongPage(ctx, m.webUrl) }
-                            CardAction("HISTORY", Icons.Default.History, MikuTeal, onHistory)
+                            CardAction("OPEN", Icons.AutoMirrored.Filled.OpenInNew, HionePink) { openSongPage(ctx, m.webUrl) }
+                            CardAction("HISTORY", Icons.Default.History, HioneTeal, onHistory)
                         }
                     }
                 }
@@ -249,16 +249,16 @@ fun SongIdCard(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifier 
             else -> Column(Modifier.padding(end = 40.dp)) {
                 Text(
                     if (state.phase == FmSongId.Phase.NOT_FOUND) "NO MATCH" else "SONG ID UNAVAILABLE",
-                    color = if (state.phase == FmSongId.Phase.NOT_FOUND) CyberAmber else MikuNeonPink,
+                    color = if (state.phase == FmSongId.Phase.NOT_FOUND) CyberAmber else HioneNeonPink,
                     fontSize = 9.sp, fontWeight = FontWeight.Bold, fontFamily = AudiowideFont,
                 )
                 state.message?.let {
-                    Text(it, color = MikuTextPrimary, fontSize = 8.5.sp, lineHeight = 11.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    Text(it, color = HioneTextPrimary, fontSize = 8.5.sp, lineHeight = 11.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    CardAction("TRY AGAIN", Icons.Default.Refresh, MikuPink) { FmRadioManager.identifySong() }
-                    if (state.history.isNotEmpty()) CardAction("HISTORY", Icons.Default.History, MikuTeal, onHistory)
+                    CardAction("TRY AGAIN", Icons.Default.Refresh, HionePink) { FmRadioManager.identifySong() }
+                    if (state.history.isNotEmpty()) CardAction("HISTORY", Icons.Default.History, HioneTeal, onHistory)
                 }
             }
         }
@@ -267,7 +267,7 @@ fun SongIdCard(state: FmSongId.State, onHistory: () -> Unit, modifier: Modifier 
                 .pressable { FmRadioManager.dismissSongId() },
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Close, "Dismiss", tint = MikuTextSecondary, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Close, "Dismiss", tint = HioneTextSecondary, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -308,17 +308,17 @@ private fun Cover(url: String?, size: androidx.compose.ui.unit.Dp) {
 @Composable
 fun ColumnScope.FmSongHistory(state: FmSongId.State) {
     val ctx = LocalContext.current
-    Text("SONGS IDENTIFIED", color = MikuCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+    Text("SONGS IDENTIFIED", color = HioneCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold,
          fontFamily = AudiowideFont, letterSpacing = 1.sp)
     Spacer(Modifier.height(2.dp))
     Text(
         "This session, newest first. Tap one to open it. Identification sends a fingerprint of the " +
             "last few seconds of radio audio (not the audio) to Shazam's service.",
-        color = MikuTextSecondary, fontSize = 8.sp, lineHeight = 11.sp,
+        color = HioneTextSecondary, fontSize = 8.sp, lineHeight = 11.sp,
     )
     Spacer(Modifier.height(8.dp))
     if (state.history.isEmpty()) {
-        Text("Nothing yet. Tap SONG ID while music is playing.", color = MikuTextPrimary, fontSize = 9.sp)
+        Text("Nothing yet. Tap SONG ID while music is playing.", color = HioneTextPrimary, fontSize = 9.sp)
         return
     }
     val fmt = SimpleDateFormat("HH:mm", Locale.US)
@@ -326,7 +326,7 @@ fun ColumnScope.FmSongHistory(state: FmSongId.State) {
         items(state.history.distinctBy { "${it.atMs}${it.title}" }, key = { "${it.atMs}${it.title}" }) { m ->
             Row(
                 Modifier.fillMaxWidth().heightIn(min = 56.dp)
-                    .glass(RoundedCornerShape(12.dp), accent = MikuPink, rimAlpha = 0.35f, shine = 0.6f)
+                    .glass(RoundedCornerShape(12.dp), accent = HionePink, rimAlpha = 0.35f, shine = 0.6f)
                     .pressable(pressedScale = 0.98f) { openSongPage(ctx, m.webUrl) }
                     .padding(6.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -335,13 +335,13 @@ fun ColumnScope.FmSongHistory(state: FmSongId.State) {
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Text(m.title, color = Color.White, fontSize = 10.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(m.artist, color = MikuTealBright, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    m.album?.let { Text(it, color = MikuTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                    Text(m.artist, color = HioneTealBright, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    m.album?.let { Text(it, color = HioneTextSecondary, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                 }
                 LikeButton(m, compact = true)
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(fmt.format(Date(m.atMs)), color = MikuTextSecondary, fontSize = 8.sp, fontFamily = AudiowideFont)
-                    Text("${fmtMhz(m.freqKHz)}", color = MikuPink, fontSize = 8.sp, fontFamily = AudiowideFont)
+                    Text(fmt.format(Date(m.atMs)), color = HioneTextSecondary, fontSize = 8.sp, fontFamily = AudiowideFont)
+                    Text("${fmtMhz(m.freqKHz)}", color = HionePink, fontSize = 8.sp, fontFamily = AudiowideFont)
                 }
             }
         }
@@ -352,7 +352,7 @@ fun ColumnScope.FmSongHistory(state: FmSongId.State) {
 
 /**
  * The heart. Liking keeps the track with the station, frequency, time and place it was heard,
- * and hands it to Miku Music as something to get. The liked state is read and written off the
+ * and hands it to Hione Music as something to get. The liked state is read and written off the
  * main thread (it is a small JSON file in prefs plus a hand-off to the other app).
  */
 @Composable
@@ -369,7 +369,7 @@ fun LikeButton(m: FmSongId.Match, compact: Boolean = false) {
             val now = withContext(Dispatchers.IO) { runCatching { FmRadioManager.toggleLikeSong(ctx, m) }.getOrNull() }
             if (now != null) {
                 liked = now
-                Toast.makeText(ctx, if (now) "Liked. Added to Wanted in Miku Music" else "Removed from Miku Music likes",
+                Toast.makeText(ctx, if (now) "Liked. Added to Wanted in Hione Music" else "Removed from Hione Music likes",
                     Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(ctx, "Could not save the like", Toast.LENGTH_SHORT).show()
@@ -379,10 +379,10 @@ fun LikeButton(m: FmSongId.Match, compact: Boolean = false) {
     if (compact) {
         Box(Modifier.size(44.dp).clip(CircleShape).pressable(onClick = toggle), contentAlignment = Alignment.Center) {
             Icon(if (on) Icons.Default.Favorite else Icons.Default.FavoriteBorder, if (on) "Unlike" else "Like",
-                 tint = if (on) MikuPink else MikuTextSecondary, modifier = Modifier.size(20.dp))
+                 tint = if (on) HionePink else HioneTextSecondary, modifier = Modifier.size(20.dp))
         }
     } else {
         CardAction(if (on) "LIKED" else "LIKE", if (on) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                   if (on) MikuNeonPink else MikuPink, toggle)
+                   if (on) HioneNeonPink else HionePink, toggle)
     }
 }

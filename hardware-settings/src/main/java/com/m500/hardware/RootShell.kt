@@ -22,7 +22,7 @@ object RootShell {
     @Volatile private var isSessionActive = false
 
     /**
-     * ROOT IS OPTIONAL. MikuOS never requires su for anything: every feature has a platform-signed,
+     * ROOT IS OPTIONAL. HioneOS never requires su for anything: every feature has a platform-signed,
      * root-free path, and that path is what ships. Root is a power-user ENHANCEMENT — where it is
      * present it can unlock extra hardware (the SELinux-locked LED nodes, for one) and this class
      * is how that gets used.
@@ -44,7 +44,7 @@ object RootShell {
         suAbsent = true
         if (loggedAbsence.compareAndSet(false, true)) {
             Log.i(TAG, "no root available ($reason) - optional root-backed extras are off. This is the " +
-                "normal, supported state: MikuOS is platform-signed and every feature has a " +
+                "normal, supported state: ${Mascot.osName} is platform-signed and every feature has a " +
                 "root-free path. Call RootShell.recheck() if the user grants root later.")
         }
     }

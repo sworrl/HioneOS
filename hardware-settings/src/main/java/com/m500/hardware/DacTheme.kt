@@ -2,9 +2,9 @@ package com.m500.hardware
 
 // DAC theme: one pure function from the applied DAC settings to a palette.
 //
-// The same file (only the package line differs) lives in hardware-settings, mikuos-systemui and
-// Miku Music (app). Keep them identical so the Hardware app, the status bar badge, the SystemUI
-// tiles and Miku Music's DAC panel always show the same colors for the same settings.
+// The same file (only the package line differs) lives in hardware-settings, hioneos-systemui and
+// Hione Music (app). Keep them identical so the Hardware app, the status bar badge, the SystemUI
+// tiles and Hione Music's DAC panel always show the same colors for the same settings.
 //
 // Mapping:
 //   filter      -> base hue. NOS 32 (amber), fast/low latency 190 (cyan), fast/phase compensated
@@ -15,7 +15,7 @@ package com.m500.hardware
 //   high power  -> glow 0.9 and pulse on. Off: glow 0.3, no pulse.
 // Every text color is pushed lighter until it reaches 4.5:1 against the background tint.
 //
-// Inputs are the raw property values (persist.vendor.audio.miku.* or the miku_dac_state string):
+// Inputs are the raw property values (persist.vendor.audio.hione.* or the hione_dac_state string):
 //   filter  fast_rolloff_low_latency | fast_rolloff_phase_compensated | slow_rolloff_low_latency |
 //           slow_rolloff_phase_compensated | nos | null
 //   gain    low | middle | high | null
@@ -41,12 +41,12 @@ data class DacPalette(
     val badge: String,
 )
 
-/** Parsed miku_dac_state. */
+/** Parsed hione_dac_state. */
 data class DacState(val filter: String?, val gain: String?, val dre: Boolean?, val hp: Boolean?) {
     val isEmpty: Boolean get() = filter == null && gain == null && dre == null && hp == null
 }
 
-/** Parse Settings.Global miku_dac_state, "filter=nos;gain=high;dre=dremode_enable;hp=hpower_enable". */
+/** Parse Settings.Global hione_dac_state, "filter=nos;gain=high;dre=dremode_enable;hp=hpower_enable". */
 fun parseDacState(raw: String?): DacState {
     val m = raw.orEmpty().split(';').mapNotNull { part ->
         val i = part.indexOf('=')

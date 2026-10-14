@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tap orb needs a finger-sized target, so the default is a touch taller than the badge family,
+     but it can still be squeezed back to badge size (minResize 40dp). -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="56dp"
+    android:minResizeWidth="40dp"
+    android:minResizeHeight="40dp"
+    android:maxResizeWidth="300dp"
+    android:maxResizeHeight="160dp"
+    android:targetCellWidth="1"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen|keyguard"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_hione_bpm_tapper"
+    android:previewLayout="@layout/widget_hione_bpm_tapper"
+    android:description="@string/widget_desc_bpm_tapper" />

@@ -18,7 +18,7 @@
         android:contentDescription="@string/app_name" />
 
     <!-- Invisible tap targets ONLY — no icon, no background chrome. The actual transport glyphs
-         are drawn INTO the bitmap itself (bigger, crisper, Miku-teal, part of the cassette's own
+         are drawn INTO the bitmap itself (bigger, crisper, Hione-teal, part of the cassette's own
          artwork) instead of a separate floating Android button row on top of it; these three
          regions just need to line up with where the bitmap draws them (see renderMiniTape's
          control-cluster geometry) so they're still tappable.

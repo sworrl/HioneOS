@@ -166,10 +166,10 @@ class FmSpectrumSurfaceView(context: Context) : SurfaceView(context), SurfaceHol
         private val tracePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE; color = TEAL_BRIGHT; strokeJoin = Paint.Join.ROUND
         }
-        private val peakPaint = Paint().apply { color = 0xE6FF5FA2.toInt() }
+        private val peakPaint = Paint().apply { color = 0xE68EC5FF.toInt() }
         private val wfPaint = Paint().apply { isFilterBitmap = true }
         private val cursorPaint = Paint().apply { color = 0xB3FFFFFF.toInt() }
-        private val readoutBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE6040D12.toInt() }
+        private val readoutBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE60C0D10.toInt() }
         private val readoutText = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFFFFF.toInt(); isFakeBoldText = true }
         private val barPaint = Paint()
         private var scanning = false
@@ -579,7 +579,7 @@ class FmSpectrumSurfaceView(context: Context) : SurfaceView(context), SurfaceHol
             for (hit in st.scanResults) {
                 if (hit.freqKHz !in hitBirth) {
                     hitBirth[hit.freqKHz] = now
-                    hitName[hit.freqKHz] = stationOn(hit.freqKHz, st.nearbyStations)?.call ?: fmtMhz(hit.freqKHz)
+                    hitName[hit.freqKHz] = stationOn(hit.freqKHz, st.nearbyStations)?.let { if (it.isJapan) it.chipLabel else it.call } ?: fmtMhz(hit.freqKHz)
                     lastHitKhz = hit.freqKHz; lastHitAt = now
                 }
             }
@@ -654,11 +654,11 @@ class FmSpectrumSurfaceView(context: Context) : SurfaceView(context), SurfaceHol
         private val MINOR_HZ = floatArrayOf(30f, 40f, 60f, 70f, 80f, 90f, 300f, 400f, 600f, 700f, 800f, 900f,
             3000f, 4000f, 6000f, 7000f, 8000f, 9000f, 15000f)
 
-        private const val BG = 0xFF040D12.toInt()
-        private const val TEAL = 0xFF39C5BB.toInt()
-        private const val TEAL_BRIGHT = 0xFF7FE6DE.toInt()
-        private const val CYAN = 0xFF00E5FF.toInt()
-        private const val PINK = 0xFFFF5FA2.toInt()
+        private const val BG = 0xFF0C0D10.toInt()
+        private const val TEAL = 0xFFFFAB2E.toInt()
+        private const val TEAL_BRIGHT = 0xFFFFD08A.toInt()
+        private const val CYAN = 0xFFFFC56B.toInt()
+        private const val PINK = 0xFF8EC5FF.toInt()
 
         private fun argb(alpha: Float, rgb: Int): Int =
             ((alpha.coerceIn(0f, 1f) * 255f).roundToInt() shl 24) or (rgb and 0xFFFFFF)

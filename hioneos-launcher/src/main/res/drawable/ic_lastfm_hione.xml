@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+
+    <!-- Cyberpunk squircle background -->
+    <path
+        android:pathData="M 32,8 L 128,8 A 24,24 0 0 1 152,32 L 152,128 A 24,24 0 0 1 128,152 L 32,152 A 24,24 0 0 1 8,128 L 8,32 A 24,24 0 0 1 32,8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:angle="135"
+                android:endColor="#051017"
+                android:startColor="#1A050B"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Neon border -->
+    <path
+        android:pathData="M 32,8 L 128,8 A 24,24 0 0 1 152,32 L 152,128 A 24,24 0 0 1 128,152 L 32,152 A 24,24 0 0 1 8,128 L 8,32 A 24,24 0 0 1 32,8 Z"
+        android:strokeWidth="2.5">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:angle="45"
+                android:endColor="#00FFCC"
+                android:startColor="#D51007"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Last.fm stylized ribbon in Hione crimson & cyan halo -->
+    <path
+        android:pathData="M 46,112 C 40,112 36,106 36,96 C 36,80 46,72 58,72 C 68,72 73,77 78,87 L 85,102 C 90,112 98,116 109,116 C 122,116 131,106 131,92 C 131,77 122,69 110,69 C 103,69 97,72 93,78 L 90,72 L 78,72 C 78,60 80,50 82,44 L 64,44 C 62,52 60,62 60,74 C 54,67 48,64 38,64 C 22,64 10,77 10,98 C 10,119 23,128 44,128 C 55,128 65,122 71,114 L 66,104 C 61,110 54,112 46,112 Z M 109,81 C 115,81 119,85 119,92 C 119,99 115,104 109,104 C 103,104 99,99 96,92 L 95,89 C 97,84 102,81 109,81 Z"
+        android:fillColor="#FF2A4D" />
+
+    <!-- Cyan acoustic sparkle dot -->
+    <path
+        android:pathData="M 124,46 A 6,6 0 1 1 124,45.9 Z"
+        android:fillColor="#00FFCC" />
+</vector>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  HioneOS system bridge. The one HioneOS package that runs as the system UID, so it gets the
+  system_app SELinux domain: HiBy's policy lets system_app set vendor_usb_prop, usb_control_prop
+  and vendor_audio_prop, and lets platform_app (every other Hione app) set almost nothing.
+  It has no UI and does exactly what the receivers below list, only for callers holding the
+  signature permission, i.e. other apps signed with the platform key.
+  It is persistent so the charge limit (ChargeLimiter) can follow the battery: the system starts
+  it at boot and restarts it if it dies.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:sharedUserId="android.uid.system"
+    tools:ignore="SharedUserId">
+
+    <!-- Mascot pack voice clips come from Hione Update's provider (see SoundEvents.packClip). -->
+    <permission
+        android:name="com.hione.permission.MASCOT_PACKS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.MASCOT_PACKS" />
+    <queries>
+        <provider android:authorities="com.hione.update.mascot" />
+    </queries>
+
+
+    <permission
+        android:name="com.hione.permission.SYSTEM_BRIDGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.hione.permission.SYSTEM_BRIDGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <!-- BootSeeds. The system uid passes these checks anyway, they are listed for readers. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.GRANT_RUNTIME_PERMISSIONS" />
+    <uses-permission android:name="android.permission.MANAGE_APP_OPS_MODES" />
+    <uses-permission android:name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_OVERLAY_PACKAGES" />
+    <!-- SoundEvents: spots new screenshots in MediaStore to play the screenshot sound. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <application
+        android:name=".BridgeApp"
+        android:label="HioneOS system bridge"
+        android:allowBackup="false"
+        android:persistent="true">
+        <receiver
+            android:name=".BridgeReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
+            <intent-filter>
+                <action android:name="com.hione.sysbridge.USB_DAC" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".AudioReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
+            <intent-filter>
+                <action android:name="com.hione.sysbridge.AUDIO" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".LedReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
+            <intent-filter>
+                <action android:name="com.hione.sysbridge.LED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".TouchWakeReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
+            <intent-filter>
+                <action android:name="com.hione.sysbridge.TOUCH_WAKE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".HttpProxyReceiver"
+            android:exported="true"
+            android:permission="com.hione.permission.SYSTEM_BRIDGE">
+            <intent-filter>
+                <action android:name="com.hione.sysbridge.HTTP" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".BootSeedsReceiver"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

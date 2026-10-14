@@ -492,7 +492,7 @@ func handleManifest(w http.ResponseWriter, r *http.Request) {
 			PackageName: "com.hione.launcher",
 			Version:     "0.1.0",
 			Path:        latestApk(filepath.Join(cfg.ApkDir, "hioneos-launcher", "build", "outputs", "apk", "release", "HioneOS_Launcher-v*.apk")),
-			Description: "Hatsune Hione Jetpack Compose Cyber Launcher & System Gesture Navigation",
+			Description: "Oki Hione Jetpack Compose Cyber Launcher & System Gesture Navigation",
 			TargetDir:   "/system/app/HioneLauncher/",
 		},
 		{
@@ -532,7 +532,7 @@ func handleManifest(w http.ResponseWriter, r *http.Request) {
 
 	manifest := ManifestResponse{
 		OSName:          "HioneOS for HiBy M500",
-		Version:         "v0.1.0 (Cyber Hatsune Hione Edition)",
+		Version:         "v0.1.0 (Cyber Oki Hione Edition)",
 		TargetDevice:    "HiBy M500 (Qualcomm Snapdragon SoC)",
 		HardwareDAC:     "Cirrus Logic Dual CS43198 MasterHIFI™",
 		KernelVersion:   "5.4.233-android14-gki",

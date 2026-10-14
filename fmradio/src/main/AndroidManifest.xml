@@ -33,8 +33,8 @@
     <!-- Song ID (fingerprint to the recognition service), its cover art, and the terrain
          profile behind every line-of-sight verdict all go over the network. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Network goes through com.miku.sysbridge; see FmNet. -->
-    <uses-permission android:name="com.miku.permission.SYSTEM_BRIDGE" />
+    <!-- Network goes through com.hione.sysbridge; see FmNet. -->
+    <uses-permission android:name="com.hione.permission.SYSTEM_BRIDGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Hardware transport keys (FmMediaKeys): a haptic tick per press, and the system media
          key listener that hands the keys to the radio while it is on. SET_MEDIA_KEY_LISTENER
@@ -47,7 +47,7 @@
         tools:ignore="ProtectedPermissions" />
 
     <!--
-      The tuner keeps running when the activity goes away (MikuFmService). On Android 14 a
+      The tuner keeps running when the activity goes away (HioneFmService). On Android 14 a
       foreground service that holds audio must declare the media-playback type here as well as
       in the service element, and must hold the matching typed permission; the untyped
       FOREGROUND_SERVICE permission on its own is no longer enough.
@@ -64,14 +64,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MikuFM">
+        android:theme="@style/Theme.HioneFM">
 
         <!-- The stock FM driver JNI (qcom.fmradio / FmReceiverJNI) lives in this shared
              library; declare it so the classloader can reach /system/framework/qcom.fmradio.jar. -->
         <uses-library android:name="qcom.fmradio" android:required="false" />
 
         <activity
-            android:name="com.caf.fmradio.MikuFMRadioActivity"
+            android:name="com.caf.fmradio.HioneFMRadioActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -84,7 +84,7 @@
 
         <!-- Not exported: only this app and its own notification actions talk to it. -->
         <service
-            android:name="com.caf.fmradio.MikuFmService"
+            android:name="com.caf.fmradio.HioneFmService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 

@@ -44,15 +44,15 @@ fun FmFresnelProfileView(
     Box(
         modifier
             .fillMaxWidth()
-            .background(Color(0xFF040D12), RoundedCornerShape(14.dp))
+            .background(Color(0xFF0C0D10), RoundedCornerShape(14.dp))
             .border(1.2.dp, CyberGlassBorder, RoundedCornerShape(14.dp))
     ) {
         if (profile == null) {
             Column(Modifier.align(Alignment.Center).padding(14.dp)) {
-                Text("NO TERRAIN PROFILE", color = MikuTeal.copy(alpha = 0.8f),
+                Text("NO TERRAIN PROFILE", color = HioneTeal.copy(alpha = 0.8f),
                      fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 Text("Needs a position and one lookup against the elevation service.",
-                     color = MikuTeal.copy(alpha = 0.45f), fontSize = 7.sp)
+                     color = HioneTeal.copy(alpha = 0.45f), fontSize = 7.sp)
             }
             return@Box
         }
@@ -85,8 +85,8 @@ fun FmFresnelProfileView(
                 for (p in pts.reversed()) lineTo(x(p.distM), y(p.sightM - p.fresnelM))
                 close()
             }
-            drawPath(zone, MikuTeal.copy(alpha = 0.13f))
-            drawPath(zone, MikuTeal.copy(alpha = 0.35f), style = Stroke(width = 1f))
+            drawPath(zone, HioneTeal.copy(alpha = 0.13f))
+            drawPath(zone, HioneTeal.copy(alpha = 0.35f), style = Stroke(width = 1f))
 
             // The 60% boundary: inside this and the path starts costing signal.
             val sixty = Path().apply {
@@ -94,7 +94,7 @@ fun FmFresnelProfileView(
                        y(pts.first().sightM - pts.first().fresnelM * FmFresnel.FRESNEL_RULE))
                 for (p in pts) lineTo(x(p.distM), y(p.sightM - p.fresnelM * FmFresnel.FRESNEL_RULE))
             }
-            drawPath(sixty, MikuPink.copy(alpha = 0.45f), style = Stroke(
+            drawPath(sixty, HionePink.copy(alpha = 0.45f), style = Stroke(
                 width = 1f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f))))
 
             // Line of sight.
@@ -102,7 +102,7 @@ fun FmFresnelProfileView(
                 moveTo(x(pts.first().distM), y(pts.first().sightM))
                 for (p in pts) lineTo(x(p.distM), y(p.sightM))
             }
-            drawPath(sight, MikuTeal.copy(alpha = 0.9f), style = Stroke(width = 1.6f))
+            drawPath(sight, HioneTeal.copy(alpha = 0.9f), style = Stroke(width = 1.6f))
 
             // The ground, filled. Where it rises through the sight line it is drawn in pink,
             // because that is the part that is in the way and it should be obvious which.
@@ -119,14 +119,14 @@ fun FmFresnelProfileView(
                     moveTo(x(pts.first().distM), y(pts.first().groundM))
                     for (p in pts) lineTo(x(p.distM), y(p.groundM))
                 },
-                if (profile.blocked) MikuNeonPink else MikuTeal,
+                if (profile.blocked) HioneNeonPink else HioneTeal,
                 style = Stroke(width = 1.8f))
 
             // Mark the worst point, which is the one the verdict is about.
             profile.worst?.let { wst ->
                 val px = x(wst.distM)
-                drawLine(MikuPink.copy(alpha = 0.6f), Offset(px, 0f), Offset(px, h), strokeWidth = 1f)
-                drawCircle(MikuPink, radius = 3f, center = Offset(px, y(wst.groundM)))
+                drawLine(HionePink.copy(alpha = 0.6f), Offset(px, 0f), Offset(px, h), strokeWidth = 1f)
+                drawCircle(HionePink, radius = 3f, center = Offset(px, y(wst.groundM)))
             }
         }
 
@@ -135,8 +135,8 @@ fun FmFresnelProfileView(
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
         ) {
             Text(
-                "PATH TO ${profile.station.call} · ${"%.1f".format(profile.distanceKm)} km",
-                color = MikuTeal.copy(alpha = 0.85f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold
+                "PATH TO ${profile.station.label} · ${"%.1f".format(profile.distanceKm)} km",
+                color = HioneTeal.copy(alpha = 0.85f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold
             )
             // The terrain line is a prediction. A reading from the tuner, when there is one,
             // is the fact and goes next to it.
@@ -147,9 +147,9 @@ fun FmFresnelProfileView(
                     else "") +
                     (rated?.measuredDbuv?.let { " · MEASURED $it dBµV" } ?: ""),
                 color = when {
-                    rated?.reach == FmReach.Verdict.HEARD -> MikuCyan
-                    profile.blocked -> MikuNeonPink
-                    else -> MikuPink
+                    rated?.reach == FmReach.Verdict.HEARD -> HioneCyan
+                    profile.blocked -> HioneNeonPink
+                    else -> HionePink
                 },
                 fontSize = 7.5.sp, fontWeight = FontWeight.Bold
             )
@@ -160,7 +160,7 @@ fun FmFresnelProfileView(
                 "worst point ${"%.1f".format(wst.distM / 1000)} km out · terrain " +
                     "${wst.groundM.toInt()} m vs sight line ${wst.sightM.toInt()} m · " +
                     "${"%.0f".format(wst.fresnelFraction * 100)}% of the first zone · prediction",
-                color = MikuTeal.copy(alpha = 0.5f), fontSize = 6.5.sp,
+                color = HioneTeal.copy(alpha = 0.5f), fontSize = 6.5.sp,
                 modifier = Modifier.align(Alignment.BottomStart).padding(horizontal = 8.dp, vertical = 2.dp)
             )
         }

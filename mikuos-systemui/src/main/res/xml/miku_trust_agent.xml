@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- MikuOS trust agent (trust/MikuTrustAgent). No settings screen: it is controlled from
-     MikuSettings > Security > Screen lock. -->
-<trust-agent xmlns:android="http://schemas.android.com/apk/res/android" />

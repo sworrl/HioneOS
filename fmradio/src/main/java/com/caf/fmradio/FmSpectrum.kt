@@ -117,7 +117,7 @@ fun RadioWaterfallSpectrum(
         Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF040D12))
+            .background(Color(0xFF0C0D10))
             .border(1.2.dp, CyberGlassBorder, RoundedCornerShape(14.dp))
     ) {
         if (mode == QualcommFmHardwareEngine.ViewMode.LIVE || isScanning) {
@@ -134,8 +134,8 @@ fun RadioWaterfallSpectrum(
                 else -> "STANDBY"
             },
             color = when {
-                isHardwareOnline -> MikuPink
-                hardwareError != null -> MikuNeonPink
+                isHardwareOnline -> HionePink
+                hardwareError != null -> HioneNeonPink
                 isPowerOn -> CyberAmber
                 else -> Color.Gray
             },
@@ -222,7 +222,7 @@ private fun BandPanel(
 
             for (g in 1..3) {
                 val gy = fftHeight * g / 4f
-                drawLine(MikuTeal.copy(alpha = 0.10f), Offset(0f, gy), Offset(w, gy), strokeWidth = 1f)
+                drawLine(HioneTeal.copy(alpha = 0.10f), Offset(0f, gy), Offset(w, gy), strokeWidth = 1f)
             }
 
             // The tuned channel, as a block the width of one channel rather than a bare line,
@@ -230,9 +230,9 @@ private fun BandPanel(
             val halfCh = (step / 2f / span) * plotW
             val cx = xOf(currentFreqKHz)
             if (skin.showsPassband) {
-                drawPassband(cx, halfCh, fftHeight, MikuTeal)
+                drawPassband(cx, halfCh, fftHeight, HioneTeal)
             } else {
-                drawRect(MikuTeal.copy(alpha = 0.16f), Offset(cx - halfCh, 0f), Size(halfCh * 2f, fftHeight))
+                drawRect(HioneTeal.copy(alpha = 0.16f), Offset(cx - halfCh, 0f), Size(halfCh * 2f, fftHeight))
             }
 
             if (hasBand && skin.showsSurface) {
@@ -253,7 +253,7 @@ private fun BandPanel(
                     }
                 }
                 if (skin.showsTimestamps) {
-                    drawWaterfallTimestamps(textMeasurer, rowTimes.take(rows.size), fftHeight, rh, MikuTeal)
+                    drawWaterfallTimestamps(textMeasurer, rowTimes.take(rows.size), fftHeight, rh, HioneTeal)
                 }
             } else {
                 // Nothing swept yet: one column per poll of the tuned frequency's own RSSI, so
@@ -272,25 +272,25 @@ private fun BandPanel(
             val scaleTop = fftHeight + waterfallHeight
             drawRect(Color(0xFF020A0F), topLeft = Offset(0f, scaleTop), size = Size(w, scaleHeight))
             scanHits.forEach { f ->
-                drawLine(MikuTeal.copy(alpha = 0.7f), Offset(xOf(f), scaleTop + scaleHeight * 0.45f),
+                drawLine(HioneTeal.copy(alpha = 0.7f), Offset(xOf(f), scaleTop + scaleHeight * 0.45f),
                     Offset(xOf(f), scaleTop + scaleHeight), strokeWidth = 1.5.dp.toPx())
             }
             favorites.forEach { f ->
-                drawLine(MikuPink.copy(alpha = 0.9f), Offset(xOf(f), scaleTop),
+                drawLine(HionePink.copy(alpha = 0.9f), Offset(xOf(f), scaleTop),
                     Offset(xOf(f), scaleTop + scaleHeight), strokeWidth = 1.5.dp.toPx())
             }
             // Catalogue ticks sit under the scan/favourite marks and are dimmer, so a station
             // the device has actually heard still reads louder than one that is merely listed.
             cataloguedStations.forEach { st ->
                 val sx = xOf(st.khz)
-                drawLine(MikuTeal.copy(alpha = 0.22f), Offset(sx, scaleTop + scaleHeight * 0.2f),
+                drawLine(HioneTeal.copy(alpha = 0.22f), Offset(sx, scaleTop + scaleHeight * 0.2f),
                     Offset(sx, scaleTop + scaleHeight), strokeWidth = 1f)
             }
             val tickStepMHz = if (span > 20000f) 4 else 2
             var mhzTick = ((band.lowKHz / 1000) / tickStepMHz + 1) * tickStepMHz
             while (mhzTick * 1000 <= band.highKHz) {
                 val sx = xOf(mhzTick * 1000)
-                drawLine(MikuTeal.copy(alpha = 0.3f), Offset(sx, scaleTop + scaleHeight * 0.55f),
+                drawLine(HioneTeal.copy(alpha = 0.3f), Offset(sx, scaleTop + scaleHeight * 0.55f),
                     Offset(sx, scaleTop + scaleHeight), strokeWidth = 1f)
                 mhzTick += tickStepMHz
             }
@@ -321,16 +321,16 @@ private fun BandPanel(
             }
             if (drew) {
                 fillPath.addPath(fftPath); fillPath.lineTo(w, fftHeight); fillPath.lineTo(gutter, fftHeight); fillPath.close()
-                drawPath(fillPath, Brush.verticalGradient(listOf(Color(0x8800E5FF), Color(0x1100E5FF)), 0f, fftHeight))
-                drawPath(fftPath, MikuTeal, style = Stroke(width = 2.dp.toPx()))
+                drawPath(fillPath, Brush.verticalGradient(listOf(Color(0x88FFC56B), Color(0x11FFC56B)), 0f, fftHeight))
+                drawPath(fftPath, HioneTeal, style = Stroke(width = 2.dp.toPx()))
             }
 
             if (skin.showsAxis) {
-                drawRssiAxis(textMeasurer, gutter, fftHeight, QualcommFmHardwareEngine.SWEEP_RSSI_FULL_SCALE, MikuTeal)
+                drawRssiAxis(textMeasurer, gutter, fftHeight, QualcommFmHardwareEngine.SWEEP_RSSI_FULL_SCALE, HioneTeal)
             }
 
             // The tuned frequency. Only meaningful on a frequency axis, so only drawn here.
-            drawLine(MikuPink, Offset(cx, 0f), Offset(cx, h), strokeWidth = 2.dp.toPx())
+            drawLine(HionePink, Offset(cx, 0f), Offset(cx, h), strokeWidth = 2.dp.toPx())
         }
 
         // Call signs over the band, which is the difference between a spectrum and a dial you
@@ -353,8 +353,8 @@ private fun BandPanel(
                 for ((st, x) in placed) {
                     val tuned = kotlin.math.abs(st.khz - currentFreqKHz) <= 60
                     Text(
-                        st.call,
-                        color = if (tuned) MikuPink else stationColor(st.call).copy(alpha = 0.7f),
+                        if (st.isJapan) st.chipLabel else st.call,
+                        color = if (tuned) HionePink else stationColor(st.call).copy(alpha = 0.7f),
                         fontSize = 6.5.sp,
                         fontWeight = if (tuned) FontWeight.Bold else FontWeight.Normal,
                         maxLines = 1,
@@ -367,7 +367,7 @@ private fun BandPanel(
         Text(
             if (hasBand) "${skin.label} · RSSI vs FREQUENCY · TAP A PEAK TO TUNE"
             else "${skin.label} · ${band.lowKHz / 1000}–${band.highKHz / 1000} MHz · FIRST SWEEP…",
-            color = MikuTeal.copy(alpha = 0.85f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold,
+            color = HioneTeal.copy(alpha = 0.85f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold,
             // The header doubles as the skin control. A dedicated row of buttons would eat
             // height this panel does not have, and the label already says which one is on.
             modifier = Modifier.clickable { onCycleSkin() }.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -387,7 +387,7 @@ fun FmRecordButton(isRecording: Boolean, onClick: () -> Unit) {
                     if (isRecording) Modifier.clip(CircleShape)
                         .background(Brush.verticalGradient(listOf(Color(0xFFFF1744), Color(0xFFB71C1C))))
                         .border(1.5.dp, Color(0xFFFF5252), CircleShape)
-                    else Modifier.glass(CircleShape, accent = Color(0xFFFF5252), accent2 = MikuTeal, rimAlpha = 0.5f)
+                    else Modifier.glass(CircleShape, accent = Color(0xFFFF5252), accent2 = HioneTeal, rimAlpha = 0.5f)
                 )
                 .pressable(onClick = onClick),
             contentAlignment = Alignment.Center
