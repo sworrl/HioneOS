@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HioneOS Portal & Flasher Suite | hioneos.falcontechnix.com</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <style>
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0 24px 0;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: #90a4ae;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nav-tab:hover {
+            color: #FFC56B;
+            border-color: #FFC56B;
+            background: rgba(0, 229, 255, 0.1);
+        }
+        .nav-tab.active {
+            color: #000;
+            background: #FFC56B;
+            border-color: #FFC56B;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .app-card {
+            background: rgba(16, 22, 38, 0.75);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+        .spec-card {
+            background: rgba(20, 27, 45, 0.7);
+            border: 1px solid rgba(255, 64, 129, 0.25);
+            border-radius: 10px;
+            padding: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Brand Header -->
+        <header>
+            <div class="brand-section">
+                <div class="hione-badge-logo">39</div>
+                <div class="brand-title">
+                    <h1>HioneOS Portal & Flasher Suite</h1>
+                    <p>Official Portal for HiBy M500 DAP · hioneos.falcontechnix.com · Release v1.0.0</p>
+                </div>
+            </div>
+            <div class="hardware-capsules">
+                <div class="capsule"><span>📱</span> HiBy M500 DAP</div>
+                <div class="capsule"><span>🎧</span> Dual CS43198 DAC</div>
+                <div class="capsule pink"><span>✨</span> SGM31324 Pulsar RGB</div>
+                <div class="capsule"><span>⚡</span> Android 14 GKI</div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="tab-flasher">⚡ Flasher & Root Suite</button>
+            <button class="nav-tab" data-tab="tab-apps">📦 Core Apps & Downloads (v1.0.0)</button>
+            <button class="nav-tab" data-tab="tab-specs">📊 Hardware Specs & Audio HAL</button>
+            <button class="nav-tab" data-tab="tab-changelog">📜 Release Notes & Changelog</button>
+        </div>
+
+        <!-- TAB 1: Flasher & Root Suite -->
+        <div id="tab-flasher" class="tab-pane active">
+            <div class="flasher-grid">
+                <!-- Left Column: Operations & Device Matrix -->
+                <div class="flasher-controls">
+                    
+                    <!-- Firmware Profile Selector -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>📦</span> Target Firmware Profile</div>
+                            <span class="badge-tag cyan" id="profileBadge">Custom ROM</span>
+                        </div>
+
+                        <div class="profile-select-container">
+                            <label style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Select Installation Target</label>
+                            <select id="profileSelect" class="cyber-select">
+                                <option value="hioneos-v1.0.0">🌟 HioneOS v1.0.0 (Master Release) [RECOMMENDED]</option>
+                                <option value="hiby-stock-1.00">🏛️ Official HiBy Factory Firmware v1.00 (Unbrick / Stock Restore)</option>
+                                <option value="hioneos-recovery">🛡️ AVB & Bootchain Emergency Repair (No Data Wipe)</option>
+                            </select>
+                            <div class="profile-desc-banner" id="profileDesc">
+                                Full custom OS installation with AVB 2.0 disabler, dynamic HioneOS system container, debloated stock apps, and auto-ADB.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1-Click Rooting & Security Toolkit -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>⚡</span> 1-Click Magisk Root & Unroot</div>
+                            <span class="badge-tag cyan">Root Suite</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">
+                            One-click patch & flash init_boot for Magisk root or restore pristine stock boot without wiping user data:
+                        </div>
+                        <div class="btn-group" style="gap: 8px;">
+                            <button id="btnOneClickRoot" class="cyber-btn" style="background: rgba(0, 229, 255, 0.2); border-color: #FFC56B; font-weight: 700;">
+                                <span>⚡</span> 1-Click Magisk Root
+                            </button>
+                            <button id="btnUnrootClean" class="cyber-btn pink" style="font-weight: 700;">
+                                <span>🛡️</span> 1-Click Clean Unroot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Device Connection & Hardware Telemetry Inspector -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>🔌</span> Device Hardware Telemetry</div>
+                            <span id="connectionBadge" class="badge-tag warn">Disconnected</span>
+                        </div>
+
+                        <div class="device-status-box">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 700; color: #ffffff;" id="deviceModelText">No Device Detected</div>
+                                <div style="font-size: 11px; color: var(--text-dim);" id="deviceDetailsText">Connect HiBy M500 in Fastboot Mode (Power + Vol Down)</div>
+                            </div>
+                            <div class="btn-group">
+                                <button id="btnWebUSB" class="cyber-btn"><span>⚡</span> Pair WebUSB</button>
+                                <button id="btnRefreshHost" class="cyber-btn pink"><span>🔄</span> Scan Host</button>
+                            </div>
+                        </div>
+
+                        <!-- Comprehensive Hardware Telemetry Grid -->
+                        <div class="telemetry-grid">
+                            <div class="telemetry-tile">
+                                <div class="label">Product / HW</div>
+                                <div class="val" id="tvProduct">--</div>
+                            </div>
+                            <div class="telemetry-tile">
+                                <div class="label">Serial Number</div>
+                                <div class="val" id="tvSerial">--</div>
+                            </div>
+                            <div class="telemetry-tile">
+                                <div class="label">Active Slot</div>
+                                <div class="val" id="tvSlot">--</div>
+                            </div>
+                            <div class="telemetry-tile">
+                                <div class="label">Bootloader State</div>
+                                <div class="val" id="tvUnlocked">--</div>
+                            </div>
+                            <div class="telemetry-tile">
+                                <div class="label">Fastboot Mode</div>
+                                <div class="val" id="tvMode">--</div>
+                            </div>
+                            <div class="telemetry-tile">
+                                <div class="label">Max Buffer</div>
+                                <div class="val" id="tvBuffer">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unbrick & Fastboot Diagnostic Toolkit -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>🛠️</span> Fastboot Unbrick & Diagnostics</div>
+                            <span class="badge-tag pink">Recovery Tools</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">
+                            Emergency recovery actions for boot loops, corrupted AVB, slot failure, or stuck partitions:
+                        </div>
+                        <div class="btn-group" style="gap: 8px;">
+                            <button id="btnSwitchSlotA" class="cyber-btn" style="font-size: 11px; padding: 7px 12px;"><span>🅰️</span> Set Slot A Active</button>
+                            <button id="btnSwitchSlotB" class="cyber-btn" style="font-size: 11px; padding: 7px 12px;"><span>🅱️</span> Set Slot B Active</button>
+                            <button id="btnFastbootd" class="cyber-btn" style="font-size: 11px; padding: 7px 12px;"><span>⚡</span> Enter Fastbootd</button>
+                            <button id="btnAvbFix" class="cyber-btn pink" style="font-size: 11px; padding: 7px 12px;"><span>🛡️</span> Flash AVB Fix</button>
+                            <button id="btnEraseData" class="cyber-btn pink" style="font-size: 11px; padding: 7px 12px;"><span>🧹</span> Format Userdata</button>
+                            <button id="btnRebootSystem" class="cyber-btn" style="font-size: 11px; padding: 7px 12px;"><span>🔄</span> Reboot System</button>
+                        </div>
+                    </div>
+
+                    <!-- Flashing Action Card -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>⚡</span> Flash Operations</div>
+                            <span class="badge-tag green" id="opStatus">Ready</span>
+                        </div>
+
+                        <!-- Progress Bar Component -->
+                        <div class="progress-card" id="progressBox" style="display: none;">
+                            <div class="progress-header">
+                                <span id="progressStatusText" style="color: var(--cyan-hione); font-weight: 700;">Flashing partition...</span>
+                                <span id="progressPercentText" style="color: #ffffff; font-weight: 800;">0%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="telemetry-row">
+                                <span id="progressBytesText">0 MB / 0 MB</span>
+                                <span id="progressSpeedText">0.00 MB/s</span>
+                            </div>
+                        </div>
+
+                        <button id="btnFlashWebUSB" class="cyber-btn large">
+                            <span>⚡</span> FLASH PROFILE VIA CHROME WEBUSB (RECOMMENDED)
+                        </button>
+                        <button id="btnFlashHost" class="cyber-btn large pink" style="margin-top: 8px;">
+                            <span>🖥️</span> FLASH PROFILE VIA HOST BACKEND ENGINE
+                        </button>
+                        <button id="btnOtaApkPush" class="cyber-btn large" style="margin-top: 8px; background: rgba(0, 230, 118, 0.15); border-color: var(--green-success);">
+                            <span>📲</span> LIVE OTA UPDATE CORE APKS VIA ADB
+                        </button>
+                    </div>
+
+                    <!-- Partition Matrix Table -->
+                    <div class="cyber-card">
+                        <div class="card-header">
+                            <div class="card-title"><span>📑</span> Partition Deployment Matrix</div>
+                        </div>
+                        <table class="matrix-table" id="partitionTable">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Partition</th>
+                                    <th>Slot Target</th>
+                                    <th>Image File</th>
+                                    <th>Size</th>
+                                </tr>
+                            </thead>
+                            <tbody id="partitionTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Live Terminal & Console Output -->
+                <div class="flasher-logs">
+                    <div class="cyber-card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <div class="card-title"><span>💻</span> Live Telemetry Terminal</div>
+                            <div class="terminal-actions">
+                                <button id="btnClearLogs" class="terminal-btn">Clear</button>
+                                <button id="btnCopyLogs" class="terminal-btn">Copy</button>
+                            </div>
+                        </div>
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <span id="terminalStatus">● SSE Stream: ACTIVE</span>
+                                <span>HiBy M500 Fastboot Bridge</span>
+                            </div>
+                            <div class="terminal-body" id="terminalLogs">
+                                <div class="log-line info">[INIT] HioneOS v1.0.0 Production Flasher initialized.</div>
+                                <div class="log-line info">[INIT] WebUSB Fastboot Engine ready. Connect device in Fastboot mode.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Core Apps & Downloads -->
+        <div id="tab-apps" class="tab-pane">
+            <div class="cyber-card">
+                <div class="card-header">
+                    <div class="card-title"><span>📦</span> HioneOS v1.0.0 Core Application Suite</div>
+                    <span class="badge-tag cyan">Production Release</span>
+                </div>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Download and install official HioneOS system APKs independently or deploy via ADB OTA push.
+                </p>
+                <div class="app-grid">
+                    <div class="app-card">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: #FFC56B;">🎵 Hione Music</div>
+                            <div style="font-size: 11px; color: #6FB0FF; font-weight: 700; margin: 2px 0;">com.hione.player · v1.0.0-hioneos</div>
+                            <p style="font-size: 12px; color: #cfd8dc; margin: 8px 0;">
+                                Bit-perfect MasterHIFI audio player, Direct ALSA CS43198 HAL, Real-time ProjectM OpenGL Visualizer, Kawaii Retro Tape Deck, BPM Observatory, and Smart ScreenTime attention sensing.
+                            </p>
+                        </div>
+                        <a href="/api/apks/HioneMusic.apk" class="cyber-btn" style="text-align: center; text-decoration: none; margin-top: 12px;"><span>📥</span> Download APK</a>
+                    </div>
+                    <div class="app-card">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: #FFC56B;">🎀 HioneOS Launcher</div>
+                            <div style="font-size: 11px; color: #6FB0FF; font-weight: 700; margin: 2px 0;">com.hione.launcher · v1.0.0-hioneos</div>
+                            <p style="font-size: 12px; color: #cfd8dc; margin: 8px 0;">
+                                Custom Cyberpunk Diva Desktop, tactile haptic gestures, Arcobocconotto RGB synchronization, and live audio-reactive dock aura.
+                            </p>
+                        </div>
+                        <a href="/api/apks/HioneOS_Launcher.apk" class="cyber-btn" style="text-align: center; text-decoration: none; margin-top: 12px;"><span>📥</span> Download APK</a>
+                    </div>
+                    <div class="app-card">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: #FFC56B;">⚡ HioneOS SystemUI</div>
+                            <div style="font-size: 11px; color: #6FB0FF; font-weight: 700; margin: 2px 0;">com.hione.systemui · v1.0.0-hioneos</div>
+                            <p style="font-size: 12px; color: #cfd8dc; margin: 8px 0;">
+                                Quick Settings notification shade, Bluetooth Audio Manager, DAC gain toggles, and status bar telemetry.
+                            </p>
+                        </div>
+                        <a href="/api/apks/HioneOS_SystemUI.apk" class="cyber-btn" style="text-align: center; text-decoration: none; margin-top: 12px;"><span>📥</span> Download APK</a>
+                    </div>
+                    <div class="app-card">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: #FFC56B;">⚙️ HioneOS Settings</div>
+                            <div style="font-size: 11px; color: #6FB0FF; font-weight: 700; margin: 2px 0;">com.hione.settings · v1.0.0-hioneos</div>
+                            <p style="font-size: 12px; color: #cfd8dc; margin: 8px 0;">
+                                Cirrus Logic DAC reconstruction filters, Gain modes, SGM31324 Pulsar RGB breath patterns, and CPU clock pinning.
+                            </p>
+                        </div>
+                        <a href="/api/apks/HioneOS_Settings.apk" class="cyber-btn" style="text-align: center; text-decoration: none; margin-top: 12px;"><span>📥</span> Download APK</a>
+                    </div>
+                    <div class="app-card">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: #FFC56B;">📻 Hione FM Radio</div>
+                            <div style="font-size: 11px; color: #6FB0FF; font-weight: 700; margin: 2px 0;">com.caf.fmradio · v1.0.0-hioneos</div>
+                            <p style="font-size: 12px; color: #cfd8dc; margin: 8px 0;">
+                                Qualcomm Snapdragon hardware FM tuner (/dev/radio0), multi-signature reflection, RDS station info, and CS43198 playback routing.
+                            </p>
+                        </div>
+                        <a href="/api/apks/HioneFMRadio.apk" class="cyber-btn" style="text-align: center; text-decoration: none; margin-top: 12px;"><span>📥</span> Download APK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Hardware Specs & Audio HAL -->
+        <div id="tab-specs" class="tab-pane">
+            <div class="cyber-card">
+                <div class="card-header">
+                    <div class="card-title"><span>📊</span> HiBy M500 Hardware & Audio Architecture</div>
+                    <span class="badge-tag cyan">Hardware Matrix</span>
+                </div>
+                <div class="spec-grid">
+                    <div class="spec-card">
+                        <div style="font-size: 12px; color: #6FB0FF; font-weight: 800;">AUDIO DAC</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #fff; margin: 4px 0;">Dual Cirrus Logic CS43198</div>
+                        <div style="font-size: 11px; color: #90a4ae;">32-bit / 768kHz PCM, Native DSD256, 130dB Dynamic Range, <0.00015% THD+N</div>
+                    </div>
+                    <div class="spec-card">
+                        <div style="font-size: 12px; color: #FFC56B; font-weight: 800;">AUDIO OUTPUTS</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #fff; margin: 4px 0;">3.5mm SE & 4.4mm BAL</div>
+                        <div style="font-size: 11px; color: #90a4ae;">Direct ALSA Hardware Routing, High/Low Gain stages, Bit-Perfect pass-through</div>
+                    </div>
+                    <div class="spec-card">
+                        <div style="font-size: 12px; color: #6FB0FF; font-weight: 800;">PLATFORM / SOC</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #fff; margin: 4px 0;">Qualcomm Snapdragon GKI</div>
+                        <div style="font-size: 11px; color: #90a4ae;">Octa-Core Kryo, Android 14 Generic Kernel Image (5.4.233), Adreno GPU</div>
+                    </div>
+                    <div class="spec-card">
+                        <div style="font-size: 12px; color: #FFC56B; font-weight: 800;">LIGHTING & SENSORS</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #fff; margin: 4px 0;">SGM31324 Pulsar Ring</div>
+                        <div style="font-size: 11px; color: #90a4ae;">BPM Reactive Aura, Attention Sensing Accelerometer, Proximity & Ambient Light</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Release Notes & Changelog -->
+        <div id="tab-changelog" class="tab-pane">
+            <div class="cyber-card">
+                <div class="card-header">
+                    <div class="card-title"><span>📜</span> Release v1.0.0-hioneos Changelog</div>
+                    <span class="badge-tag green">Production Ready</span>
+                </div>
+                <div style="font-size: 13px; color: #cfd8dc; line-height: 1.6;">
+                    <h3 style="color: #FFC56B; margin-top: 8px;">✨ Major Highlights & Innovations:</h3>
+                    <ul>
+                        <li><strong>Smart ScreenTime Sensor Fusion:</strong> Real-time attention sensing using accelerometer tilt angles (12°-80°), physiological hand micro-tremor variance, and proximity pocket gating to keep screen awake automatically when looking at the DAP.</li>
+                        <li><strong>Accurate Ingestion Telemetry:</strong> Overhauled LibraryScanService & Ingest Modal reporting exact progress (0-100%), live throughput (tracks/sec), current file indexing, and format breakdown (FLAC/DSD/WAV/MP3).</li>
+                        <li><strong>Zero-ANR Audio Pipeline:</strong> Resolved background thread stalls and generation polling feedback loops in Hione Music.</li>
+                        <li><strong>1-Click Magisk Root Suite:</strong> Integrated Fastboot init_boot patcher with one-click root and instant clean unroot restore.</li>
+                        <li><strong>Android 14 Bluetooth Hardening:</strong> Safe Bluetooth device discovery and permission handling in SystemUI Quick Settings.</li>
+                        <li><strong>Qualcomm Hardware FM Radio:</strong> Enabled /dev/radio0 tuner with multi-signature reflection and direct CS43198 audio HAL routing.</li>
+                        <li><strong>Unified Version Bump:</strong> All modules elevated to Milestone 1.0.0-hioneos (VersionCode 1000).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/fastboot-webusb.js"></script>
+    <script src="/js/webadb.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
+
