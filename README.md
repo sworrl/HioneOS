@@ -1638,13 +1638,15 @@ project isn't affiliated with or endorsed by Crypton or by HiBy Digital. Any Mik
 optional pack, and the plan is for none of it to ship by default.
 
 **The artwork isn't fully settled,** and both problems are written up in
-[ATTRIBUTIONS.md section 3](ATTRIBUTIONS.md#3-artwork). Much of the art in the source tree,
-Hione's included, was made with an image model rather than drawn by a person, which is why there's
-an open ask for real art. Some older images came off a stock M500. Those are HiBy Digital's files
-depicting Crypton's character, and there's no license here to redistribute them. The intended end
-state is that the build pulls anything like that from the stock firmware you already own and the
-tree ships only art made for the project. If you're HiBy or Crypton and want something removed,
-email github@falcontechnix.com and it comes out.
+[ATTRIBUTIONS.md section 3](ATTRIBUTIONS.md#3-artwork). Hatsune Miku and the associated character
+designs are the property of Crypton Future Media, INC. Oki Hione is our project mascot. This is an
+unaffiliated hobby project for a device Crypton licensed, and it ships no Crypton artwork. Much of
+the art in the source tree, Hione's included, was made with an image model rather than drawn by a
+person, which is why there's an open ask for real art. Some older images came off a stock M500.
+Those are HiBy Digital's files depicting Crypton's character, and there's no license here to
+redistribute them. The intended end state is that the build pulls anything like that from the
+stock firmware you already own and the tree ships only art made for the project. If you're HiBy or
+Crypton and want something removed, email github@falcontechnix.com and it comes out.
 
 HiBy Digital's firmware, bootloader and audio HAL are theirs and aren't redistributed, which is also
 why there's no prebuilt image to download. The same goes for the HiBy 1.30 files the build can use:
